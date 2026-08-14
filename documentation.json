@@ -2,10 +2,10 @@
   "name": "Workwrk",
   "colors": {
     "light": {
-      "brand": "#d2f92c"
+      "brand": "#0073EA"
     },
     "dark": {
-      "brand": "#E0F87A"
+      "brand": "#4DA3F5"
     }
   },
   "navigation": {
@@ -24,31 +24,107 @@
                 "icon": "home"
               },
               {
-                "title": "Quick Start",
-                "path": "quickstart",
-                "icon": "zap"
+                "title": "Core concepts",
+                "path": "getting-started/core-concepts",
+                "icon": "compass"
+              },
+              {
+                "title": "First week setup",
+                "path": "getting-started/first-week-setup",
+                "icon": "list-checks"
               }
             ]
           },
           {
-            "group": "Core Concepts",
+            "group": "Using WorkwrK",
             "icon": "layers",
             "pages": [
               {
-                "title": "Features",
-                "path": "features",
-                "icon": "star"
+                "title": "Spaces and tasks",
+                "path": "using/spaces-and-tasks",
+                "icon": "square-check"
+              },
+              {
+                "title": "Views",
+                "path": "using/views",
+                "icon": "table"
+              },
+              {
+                "title": "Docs and library",
+                "path": "using/docs-and-library",
+                "icon": "file-text"
+              },
+              {
+                "title": "Goals",
+                "path": "using/goals",
+                "icon": "target"
+              },
+              {
+                "title": "My profile",
+                "path": "using/my-profile",
+                "icon": "user"
+              },
+              {
+                "title": "Time and search",
+                "path": "using/time-and-search",
+                "icon": "timer"
               }
             ]
           },
           {
-            "group": "Advanced",
+            "group": "Administration",
             "icon": "settings",
             "pages": [
               {
-                "title": "Integrations",
-                "path": "integrations",
-                "icon": "plug"
+                "title": "Functions and levels",
+                "path": "admin/functions-and-levels",
+                "icon": "network"
+              },
+              {
+                "title": "Roles, KRAs and KPIs",
+                "path": "admin/roles-kras-kpis",
+                "icon": "gauge"
+              },
+              {
+                "title": "People and invites",
+                "path": "admin/people-and-invites",
+                "icon": "user-plus"
+              },
+              {
+                "title": "Reviews and cadences",
+                "path": "admin/reviews-and-cadences",
+                "icon": "calendar-check"
+              },
+              {
+                "title": "Settings",
+                "path": "admin/settings",
+                "icon": "sliders-horizontal"
+              }
+            ]
+          },
+          {
+            "group": "Reference",
+            "icon": "book-open",
+            "pages": [
+              {
+                "title": "How it connects",
+                "path": "reference/how-it-connects",
+                "icon": "git-branch"
+              },
+              {
+                "title": "Visibility and permissions",
+                "path": "reference/visibility-and-permissions",
+                "icon": "shield-check"
+              },
+              {
+                "title": "Status",
+                "path": "reference/status",
+                "icon": "activity"
+              },
+              {
+                "title": "Glossary",
+                "path": "reference/glossary",
+                "icon": "book-a"
               }
             ]
           }
