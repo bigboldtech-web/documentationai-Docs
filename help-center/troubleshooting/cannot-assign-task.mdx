@@ -1,0 +1,25 @@
+---
+title: Cannot Assign Task
+description: Fix issues when assigning tasks in Workwrk.
+---
+
+## Issue
+
+- "Assign task" button is disabled or missing
+- Unable to pick a user from the assignee list
+
+## Causes
+
+- User not added to the project
+- Insufficient permissions
+
+## Quick Fix
+
+<Steps>
+  <Step title="Check project members">
+    Go to Project > Members and make sure the user is added.
+  </Step>
+  <Step title="Verify roles">
+    Only Admins and Managers can assign tasks. Check your role in the Team tab.
+  </Step>
+</Steps>
