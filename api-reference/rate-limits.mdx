@@ -1,0 +1,110 @@
+---
+title: Rate limits
+description: Two fixed UTC windows per key, 120 requests a minute and 50,000 a day, and exactly what a 429 tells you.
+---
+
+Rate limiting is enforced per API key. Two counters run at once: one for the current UTC minute, one for the current UTC day. Exceed either and the request is rejected before it reaches any handler.
+
+## The limits
+
+| Window | Default | Stored as |
+| --- | --- | --- |
+| Per minute | 120 requests | `rateLimitPerMinute` on the key |
+| Per day | 50,000 requests | `rateLimitPerDay` on the key |
+
+Both values live on the key record itself, so different keys can carry different budgets. The **Generate API key** screen does not expose those fields, so every key created there starts on the defaults above.
+
+<Callout kind="info">
+  Limits are per key, not per organization. Two keys in the same org get 120 requests a minute each. That is the clean way to stop a chatty backfill script from starving your production integration: give it its own key.
+</Callout>
+
+Requests authenticated by a browser session rather than a key are not counted by this layer at all. That is another reason not to build an integration on the session fallback described in [Authentication](/api-reference/authentication).
+
+## How the windows work
+
+They are fixed calendar windows, not sliding ones.
+
+- The **minute** counter is keyed by the UTC minute, for example `2026-08-18T14:23`. It resets the instant the clock ticks over to `14:24`.
+- The **day** counter is keyed by the UTC date, for example `2026-08-18`. It resets at UTC midnight.
+
+Each request increments the minute counter first and checks it, then increments the day counter and checks that. Two things follow from the order:
+
+1. **Rejected requests still count.** The counter is incremented before the comparison, so hammering an endpoint while you are already limited keeps the number climbing. Back off rather than retrying in a tight loop.
+2. **A request that trips the daily limit has already consumed a minute slot.** Harmless in practice, but it means the two counters are not perfectly independent.
+
+Because the windows are fixed, a burst that straddles a boundary can briefly look like double the limit: 120 requests at `14:23:59` and 120 more at `14:24:01` are both allowed. Size your client for the steady rate, not the boundary trick.
+
+## What a 429 looks like
+
+<CodeGroup>
+```bash Request
+curl -i "https://workwrk.com/api/v1/people?limit=200" \
+  -H "Authorization: Bearer wk_live_Kf3xR9tQm2wZpL7vN4hJc8bY6dS1gA0e"
+```
+
+```json Response
+{
+  "error": "Rate limit exceeded",
+  "window": "MINUTE",
+  "retryAfter": 37
+}
+```
+</CodeGroup>
+
+Alongside the `429` status, two response headers are set:
+
+| Header | Value |
+| --- | --- |
+| `Retry-After` | Seconds to wait, the same number as `retryAfter` in the body. |
+| `X-RateLimit-Window` | Which counter tripped: `MINUTE` or `DAY`. |
+
+`retryAfter` is the exact time left in the window that tripped:
+
+- For `MINUTE`, the seconds remaining in the current UTC minute, so between 1 and 60.
+- For `DAY`, the seconds remaining until the next UTC midnight, which can be tens of thousands.
+
+<Callout kind="alert">
+  Those two headers appear **only** on a `429`. Successful responses carry no rate-limit headers at all: there is no `X-RateLimit-Limit`, no `X-RateLimit-Remaining`, and no `X-RateLimit-Reset`. You cannot inspect your remaining budget from a response, so if you need to know, count your own requests client-side.
+</Callout>
+
+## Backing off
+
+Because the window is fixed and `Retry-After` is computed from the wall clock, waiting exactly that long is guaranteed to land you in a fresh window. You do not need exponential backoff or jitter for correctness, though jitter still helps if many workers share one key.
+
+```js
+async function callWorkwrk(path, init) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const res = await fetch(`https://workwrk.com/api/v1${path}`, {
+      ...init,
+      headers: {
+        ...init?.headers,
+        Authorization: `Bearer ${process.env.WORKWRK_API_KEY}`,
+      },
+    });
+
+    if (res.status !== 429) return res;
+
+    const limitWindow = res.headers.get("X-RateLimit-Window");
+    const waitSeconds = Number(res.headers.get("Retry-After") ?? 60);
+
+    // A daily limit can be hours away. Do not hold the process open for it.
+    if (limitWindow === "DAY") {
+      throw new Error(`Daily API limit reached, resets in ${waitSeconds}s`);
+    }
+
+    await new Promise((r) => setTimeout(r, (waitSeconds + 1) * 1000));
+  }
+  throw new Error("Still rate limited after 5 attempts");
+}
+```
+
+Practical guidance:
+
+- **Sleep through a `MINUTE` limit.** It is at most a minute, and adding a second of slack avoids racing the boundary.
+- **Never sleep through a `DAY` limit.** Fail the job, alert, and resume tomorrow, or move the work to its own key.
+- **Read fewer, larger pages.** `limit=200` is the maximum on every list endpoint and costs the same one request as `limit=10`. See [Pagination](/api-reference/pagination).
+- **Prefer webhooks over polling.** If you are polling `/kudos` or `/tasks` on a timer just to notice new rows, a subscription does the same job for a fraction of the request budget. See [Webhooks](/api-reference/webhooks).
+
+## Counter retention
+
+The per-window counters are rows in the database, trimmed by a scheduled cleanup job: minute counters are deleted once they are more than 24 hours old, day counters after 30 days. This is housekeeping only and never affects whether a request is allowed. It does mean recent daily usage is retained for about a month.

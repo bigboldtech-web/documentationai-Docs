@@ -1,0 +1,128 @@
+---
+title: Errors
+description: One error envelope, six status codes, and the exact message you get for each failure on the v1 API.
+---
+
+Every failure on `https://workwrk.com/api/v1` returns the same JSON envelope: a single `error` key holding a human-readable string.
+
+```json
+{
+  "error": "title and assigneeId are required"
+}
+```
+
+There is no error code, no field-level detail object, and no request id. The string is the whole payload, and it is written to be read by a person debugging, not parsed by a program. Branch on the **status code**, and log the string.
+
+The one exception is a rate-limit rejection, which adds two extra keys on top of `error`. That shape is documented in [Rate limits](/api-reference/rate-limits).
+
+## Status codes
+
+| Code | Meaning | Where it comes from |
+| --- | --- | --- |
+| `400` | The request body is missing a required field, or breaks a rule. | The endpoint handler, after auth passed. |
+| `401` | Not authenticated. The key is missing, malformed, unknown or revoked. | The auth layer, before the handler runs. |
+| `403` | Authenticated, but the key lacks the scope this endpoint needs. | The auth layer. |
+| `404` | A referenced record does not exist in your organization. | The endpoint handler. |
+| `409` | The record already exists. Only `POST /people` returns this. | The endpoint handler. |
+| `429` | Per-minute or per-day rate limit for this key exceeded. | The auth layer. |
+
+None of the v1 handlers return a `5xx` on purpose. If you see one, it came from the framework or the proxy in front of it, and the body is not guaranteed to be the JSON envelope. Treat it as transient and retry.
+
+## 401 Unauthorized
+
+Authentication is checked before anything else, so a `401` tells you nothing about whether the rest of your request was valid.
+
+| Message | What went wrong | How to fix it |
+| --- | --- | --- |
+| `Invalid API key format` | The bearer token does not begin with `wk_live_`. | You have pasted the wrong secret, or truncated it. A real key is 40 characters. |
+| `Invalid API key` | Well-formed, but nothing in the database hashes to it. | Check for a stray space, newline, or a shell that ate part of the value. Compare the first 12 characters against the **Key prefix** column on `/settings/api`. |
+| `API key has been revoked` | The key was valid and someone revoked it. | Check `/settings/api`: revoked keys stay listed with a `revoked` badge. Generate a replacement. |
+| `Missing or invalid credentials. Send Authorization: Bearer <key>.` | No `Authorization: Bearer` header on the request. | Confirm your HTTP client is actually sending the header. Redirects and some proxies strip it. |
+| `Session missing organization` | You reached the endpoint on a browser session that has no organization attached. | Only possible on the session fallback, never with a key. |
+
+Debugging tip: run the request with `curl -i` and no other changes. If a `401` becomes a `200`, the difference is in your client's header handling, not the key.
+
+## 403 Forbidden
+
+The key is real and live, but too narrow. The message names both what was needed and what you have:
+
+```json
+{
+  "error": "This key needs \"WRITE\" scope. It has: READ."
+}
+```
+
+Every `POST` requires `WRITE`; every `GET` requires `READ`. Scopes cannot be edited after a key is created, so the fix is to generate a new key with the right boxes ticked and revoke the old one. Note that `WRITE` already satisfies `READ`, so a single **Write** key covers both directions. Details in [Authentication](/api-reference/authentication).
+
+On the browser-session fallback the equivalent message is `Session user lacks "WRITE" scope`.
+
+## 400 Bad Request
+
+Validation is deliberately shallow: each endpoint checks its required fields and rejects with a message naming them.
+
+| Endpoint | Message |
+| --- | --- |
+| `POST /people` | `email required` |
+| `POST /kras` | `name required` |
+| `POST /kpis` | `kraId, name, and targetValue are required` |
+| `POST /kpi-records` | `kpiId, userId, period, and actualValue are required` |
+| `POST /kudos` | `giverId, receiverId, and message are required` |
+| `POST /kudos` | `Cannot give kudos to yourself` |
+| `POST /tasks` | `title and assigneeId are required` |
+
+<Callout kind="alert">
+  **A malformed JSON body surfaces as a missing-field error, not a parse error.** If the body cannot be parsed it is treated as an empty object, so the handler then complains that the required fields are absent. If you get `title and assigneeId are required` while staring at a body that clearly contains both, check the JSON is valid and that you sent `Content-Type: application/json`.
+</Callout>
+
+Fields the API does not recognize are ignored rather than rejected, so a typo in an optional field name fails silently. Text fields are truncated to their column limits rather than rejected: a 900-character kudos message is stored as its first 500 characters.
+
+## 404 Not Found
+
+Returned when your request references a record that does not exist **in your organization**. Because keys are org-scoped, a valid id from a different organization is indistinguishable from a nonexistent one, and both give a `404`.
+
+| Endpoint | Message | Triggered by |
+| --- | --- | --- |
+| `POST /kpis` | `KRA not found` | `kraId` is not a KRA in your org. |
+| `POST /kpi-records` | `KPI not found` | `kpiId` is not a KPI in your org. |
+| `POST /kpi-records` | `User not in org` | `userId` is not a person in your org. |
+| `POST /kudos` | `User not found` | Either `giverId` or `receiverId` is not in your org. The message does not say which. |
+| `POST /tasks` | `Assignee not in org` | `assigneeId` is not a person in your org. |
+
+Debugging tip: resolve ids by listing rather than guessing. `GET /people?limit=200` gives you the real user ids, `GET /kras` the KRA ids, `GET /kpis?kraId=...` the KPIs under a KRA. Ids are opaque strings; do not construct or transform them.
+
+An unknown **path** also returns `404`, but from the framework rather than the API, so its body is not the `{ "error": ... }` envelope. If a `404` body is not JSON, you have the URL wrong.
+
+## 409 Conflict
+
+Only `POST /people` returns this:
+
+```json
+{
+  "error": "User already in this org"
+}
+```
+
+The email already belongs to a person in your organization. The address you send is lower-cased before the check, so `Priya@acme.com` and `priya@acme.com` are looked up as the same address. Treat `409` as success-equivalent when you are running an idempotent sync: the person you wanted is already there.
+
+## 429 Too Many Requests
+
+```json
+{
+  "error": "Rate limit exceeded",
+  "window": "MINUTE",
+  "retryAfter": 37
+}
+```
+
+The only response with extra keys and the only one that sets headers you should act on. Read [Rate limits](/api-reference/rate-limits) for the window semantics and a retry loop.
+
+## A checklist for a request that will not work
+
+<Expandable title="Walk it from the outside in">
+1. **Is the status a `401`?** Nothing else matters yet. Fix the key first, using the message table above.
+2. **Is it a `403`?** The key works. Mint one with `WRITE` and retry.
+3. **Is it a `429`?** Honour `Retry-After` and stop retrying in a loop, since rejected requests still count against the window.
+4. **Is it a `400`?** Validate your JSON, confirm `Content-Type: application/json`, then re-read the required fields for that endpoint.
+5. **Is it a `404` with a JSON body?** An id in your payload is not in your org. List the parent resource and copy the real id.
+6. **Is it a `404` without a JSON body?** The path is wrong. Compare it against the live spec at `https://workwrk.com/api/v1/openapi.json`.
+</Expandable>

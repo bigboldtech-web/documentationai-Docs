@@ -1,0 +1,116 @@
+---
+title: Pagination
+description: Every list endpoint uses the same cursor scheme, limit plus cursor in, data plus nextCursor out.
+---
+
+All seven `GET` endpoints on the v1 API paginate, and they all paginate the same way. There is no offset, no page number, and no total count.
+
+## The contract
+
+Two query parameters go in:
+
+| Parameter | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `limit` | integer | `50` | Clamped to the range 1 to 200. Values above 200 are silently reduced, not rejected. |
+| `cursor` | string | none | The `id` of a row. The response starts at the row **after** it, in that endpoint's sort order. |
+
+Two fields come back:
+
+```json
+{
+  "data": [ /* up to `limit` records */ ],
+  "nextCursor": "clx8f2n0k0005s601j4k7m2np"
+}
+```
+
+`nextCursor` is the `id` of the last record in `data` when more records exist. When you have reached the end it is `null`. That is the only stop condition: keep going while `nextCursor` is not null, and pass it back as `cursor` on the next call.
+
+<Callout kind="info">
+  A larger page costs the same one request against your [rate limit](/api-reference/rate-limits) as a small one. If you are walking a whole resource, use `limit=200`.
+</Callout>
+
+## Walking a full list
+
+<CodeGroup>
+```bash curl and jq
+KEY="wk_live_Kf3xR9tQm2wZpL7vN4hJc8bY6dS1gA0e"
+CURSOR=""
+
+while : ; do
+  URL="https://workwrk.com/api/v1/people?limit=200"
+  [ -n "$CURSOR" ] && URL="$URL&cursor=$CURSOR"
+
+  PAGE=$(curl -sS "$URL" -H "Authorization: Bearer $KEY")
+  echo "$PAGE" | jq -c '.data[]'
+
+  CURSOR=$(echo "$PAGE" | jq -r '.nextCursor // empty')
+  [ -z "$CURSOR" ] && break
+done
+```
+
+```js JavaScript
+async function* paginate(path, params = {}) {
+  let cursor = null;
+
+  do {
+    const qs = new URLSearchParams({ ...params, limit: "200" });
+    if (cursor) qs.set("cursor", cursor);
+
+    const res = await fetch(`https://workwrk.com/api/v1${path}?${qs}`, {
+      headers: { Authorization: `Bearer ${process.env.WORKWRK_API_KEY}` },
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+
+    const page = await res.json();
+    yield* page.data;
+    cursor = page.nextCursor;
+  } while (cursor);
+}
+
+for await (const person of paginate("/people", { status: "ACTIVE" })) {
+  console.log(person.email);
+}
+```
+</CodeGroup>
+
+## Per-endpoint sort order and filters
+
+The pagination parameters are identical everywhere, but the sort order and the filters are not. Filters combine with AND, and every one is an exact match. There is no free-text search and no sort parameter.
+
+| Endpoint | Sorted by | Filters |
+| --- | --- | --- |
+| `/people` | `createdAt` ascending | `status`, `departmentId` |
+| `/kras` | `createdAt` ascending | `roleId` |
+| `/kpis` | `createdAt` ascending | `kraId` |
+| `/kpi-records` | `createdAt` descending | `userId`, `kpiId`, `period` |
+| `/kudos` | `createdAt` descending | `receiverId`, `giverId` |
+| `/tasks` | `date` descending | `assigneeId`, `status`, `from`, `to` |
+| `/sops` | `updatedAt` descending | `status`, `category`, `sopType` |
+
+Accepted filter values:
+
+- `/people` `status`: `ACTIVE`, `INACTIVE`, `ON_LEAVE`, `PROBATION`, `PIP`, `NOTICE_PERIOD`
+- `/tasks` `status`: `PLANNED`, `IN_PROGRESS`, `COMPLETED`
+- `/tasks` `from` and `to`: date or date-time strings, applied to the task's `date` field as a closed range. Either can be used alone.
+- `/kpi-records` `period`: the exact period string the reading was logged with, for example `2026-Q1`
+- `/sops` `status`: `DRAFT`, `IN_REVIEW`, `APPROVED`, `PUBLISHED`, `ARCHIVED`
+- `/sops` `sopType`: `WRITTEN`, `RECORDED`, `CHECKLIST`. Note that Step-by-step SOPs are stored as `WRITTEN` (the kind is carried inside the content), so `sopType=WRITTEN` returns both written and step-by-step SOPs and this filter cannot separate them.
+
+<Callout kind="alert">
+  **`/sops` is filtered by default.** Omit `status` and you get published SOPs only, not everything. Pass `status=DRAFT` (or any other value) to see the rest. Every other endpoint returns all rows when you omit its filters.
+</Callout>
+
+## Consistency while you page
+
+The cursor identifies a row by `id`, and the server resolves its position using that endpoint's sort order. Because the sort field is not always unique or stable, a long pagination run is a series of snapshots rather than one consistent view.
+
+- **`/tasks` sorts by `date` and `/sops` by `updatedAt`.** Both can change while you are paging. Editing a SOP moves it to the front of the list, which can push a row you have not read yet onto a page you have already passed. If you need a stable window over tasks, pin it with `from` and `to`.
+- **The ascending endpoints (`/people`, `/kras`, `/kpis`) grow at the end.** Rows created during your run will be picked up before you finish, which is usually what you want for a sync.
+- **The descending endpoints (`/kpi-records`, `/kudos`) grow at the front.** Rows created after you started will be missed, because you are walking away from them. Record the timestamp when you start and re-poll from the top next time, or subscribe to [webhooks](/api-reference/webhooks) instead of polling.
+
+## What is not supported
+
+- **No total count.** Nothing in the response tells you how many records exist. The only way to count is to walk every page.
+- **No offset or page number.** `cursor` is the sole positioning mechanism. You cannot jump to page 5.
+- **No backwards paging.** There is no previous cursor. To go back, restart from the beginning.
+- **No sort parameter.** The order per endpoint is fixed, as listed above.
