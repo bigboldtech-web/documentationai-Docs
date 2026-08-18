@@ -1,24 +1,56 @@
 ---
-title: Introduction to Cashkr
-description: Cashkr buys your used phones, laptops and other devices for instant cash, with free doorstep pickup, certified data wipe and same-day payment.
+title: Introduction to WorkwrK
+description: "WorkwrK is a People and Project Management System: the work your team does, and the accountability structure that says why it matters, in one place."
 ---
 
-Cashkr is a device buyback platform. You tell us what you are selling, we quote a price instantly, a background-verified partner picks the device up from your doorstep for free, and you are paid the same day by UPI, bank transfer or cash.
+WorkwrK is a **People + Project Management System (PPMS)**. It holds two things that are normally bought separately, and it holds them in one database so they can point at each other:
 
-Cashkr is operated by BigBold Technologies Private Limited and serves 2,000+ pincodes across India through the Cashkr app and cashkr.com.
+1. **A work management platform.** Spaces, Folders, Lists, tasks, 17 view types, custom fields, subtasks, comments, time tracking. This is the ClickUp/Monday half.
+2. **A people and performance layer.** Job titles (Roles), the result areas each title owns (KRAs) with weights, the permanent gauges under those areas (KPIs), goals that hang off a single accountable person, and the reporting line that decides who sees what.
 
-## Why people sell to Cashkr
+You use it to run the work, and to answer "who owns this, and how do we know it is going well" without leaving the product.
 
-- **The quote is the price.** Pricing is locked when you book. No renegotiation at the door, no surprise deductions.
-- **Zero effort.** Free doorstep pickup at a time you choose. No listing, no buyers to meet, no fees or commissions.
-- **Same-day money.** Payment lands after on-the-spot verification, by UPI, bank transfer or cash.
-- **Your data is gone for good.** Every device gets a certified multi-pass data wipe that goes beyond a factory reset.
-- **Any condition.** Working, cracked, dead: it still has value. We buy broken and non-functional devices too.
+## Who it is for
 
-## What we buy
+WorkwrK is built for the company that actually does the work, not for an agency running it on someone else's behalf. Today the first audience is internal: our own team. Everything in this documentation is written for someone who has an account and is looking at the real screens.
 
-Smartphones, tablets, laptops, Macs, smartwatches, cameras, headphones and gaming consoles. See [Devices we buy](/devices) for the full brand list.
+Access is shaped by a fixed ladder of levels: Employee, Agent, Team Lead, Manager, Director, VP, C-Level, HR, plus Company Admin and Super Admin. Those last two are kept out of the **Role** level picker so nobody can hand out admin from a job-title dropdown, but they are not hidden everywhere: the invite modal offers Company Admin, and Settings → Members offers the whole ladder to an existing admin. That ladder drives three doors:
 
-## Where to start
+- **Employees and Agents** see their own work and their own numbers.
+- **Team Leads and Managers** see themselves plus their whole recursive report tree.
+- **Directors, VPs, C-Level, HR, Company Admin and Super Admin** see the entire organization's alignment data.
 
-Read [How selling works](/how-it-works) for the full flow, or open the Cashkr app and get your instant quote now.
+This is enforced on the server in every alignment API, not by hiding nav links. An employee who types a manager URL lands on their own career home at `/people/me` instead.
+
+## Why the two halves are one system
+
+Most teams end up with a task tool that knows nothing about accountability and a performance tool that knows nothing about the work. The result is two truths: the board says the sprint is fine, the review says the person is not.
+
+WorkwrK connects them at three specific joints that exist in the product today:
+
+- **A task can be tagged to a KRA or a KPI.** The create-task modal and the task detail panel both carry an alignment control that stamps the KRA or KPI onto the task, so a piece of work carries the result area it serves.
+- **A goal's Key Result can be measured by a KPI.** When a Key Result is linked to a KPI, its number is derived at read time from the KPI's latest reading, and hand check-ins on it are refused with an explanation rather than silently accepted. (The link is supported by the data model and the API; see the honest note below about the missing picker.)
+- **A person's KRAs come from their job title.** Assigning someone to a Role seeds their KRA assignments from that Role's templates, at the Role's weights.
+
+## What WorkwrK is not
+
+**It is not an HRIS.** There is no payroll module, no benefits enrollment, no leave or attendance tracking, no recruiting or applicant tracking in the product. Those surfaces were removed. If you are looking for a place to run a pay cycle or approve time off, it is not here.
+
+**It is not a payroll system.** WorkwrK does not calculate, file, or pay anything, and there is no pay run anywhere in the product.
+
+**It is not a compliance system of record for employment.** The person profile carries job title, function, reporting manager, access level and status, because the alignment model needs them. It does not carry an employment file.
+
+## What you get on day one
+
+- **Work**: Spaces containing Folders containing Lists, and tasks inside those Lists, viewable as a table, a Kanban board, a calendar, a Gantt chart, a timeline, a workload grid, and more.
+- **People**: a directory, an org chart built from reporting lines, a job-title library, and a personal career home for every user.
+- **Alignment**: KRAs and KPIs managed per job title, monthly KPI recording, and goals with a single owner and many contributors.
+
+## Honest notes
+
+Documentation that overstates a product is worse than documentation that is missing. These are the gaps you will hit in the areas this page describes:
+
+- **Linking a Key Result to a KPI has no picker.** The API accepts `kpiId` on a Key Result, the goal detail page renders "measured by KPI · `<name>`" for linked targets, and the check-in route correctly refuses hand entry on them. But there is no control in the UI that creates the link today. It can only be set through the API.
+- **Departments are create-and-view only in the UI.** You can create a department and see the tree; renaming, assigning a head, re-parenting and deleting exist as API endpoints but have no controls on the page yet.
+- **The invite modal does not collect department, role, or manager.** It collects emails, an access level, and the required KRA and SOP selections. You place the person into their function, job title and reporting line afterwards, from their profile.
+- **KRA weights are not forced to total 100.** Each individual weight is validated to sit between 0 and 100, and the role page shows a running "weight N% of 100" that turns red above 100, but nothing blocks a save at 80% or 130%.

@@ -1,8 +1,102 @@
 ---
 title: Changelog
-description: Notable updates to the Cashkr documentation.
+description: Version history highlighting recent updates, new features, and improvements in Workwrk.
 ---
 
-## 2026-08-18
+## Recent Updates
 
-- Initial documentation: introduction, selling flow, device categories, pricing, pickup and payment, data safety, and Help Center articles.
+Workwrk releases updates regularly to enhance your experience managing people, processes, and performance. Check the [app changelog](https://app.workwrk.com/changelog) or enable notifications to stay informed.
+
+<Callout kind="info">
+  Updates deploy automatically. Restart the app or refresh your browser to access new features.
+</Callout>
+
+<Update label="2024-10-15" description="v4.0.0" tags={["feature", "breaking"]}>
+## New Features
+
+- **Marketing Relaunch**: Completely refreshed UI across all seven hubs (Home, People, Work, Money, Talent, Culture, Growth) with improved navigation and AI-powered insights.
+- **Composite Scores**: View team performance at a glance with on-track, in-review, and at-risk indicators.
+- **AI Cmd-K**: Natural language commands for quick actions like assigning tasks or sending kudos.
+
+## Breaking Changes
+
+- Updated API endpoints for performance hubs; migrate to new `/v4/performance` paths.
+
+## Improvements
+
+- Faster dashboard loading by `>50%`.
+- Enhanced mobile support for all surfaces.
+</Update>
+
+<Update label="2024-09-20" description="v3.5.0" tags={["feature", "bugfix"]}>
+## New Features
+
+- **Kudos System**: Instant recognition across teams with emoji reactions.
+- **Auto-task Assignment**: AI suggests and assigns tasks based on SOPs and KPIs.
+- **Multi-country Support**: Localized for 8+ countries with currency conversion in Money hub.
+
+## Bug Fixes
+
+- Fixed sync issues between People and Talent hubs.
+- Resolved composite score calculation errors for large teams.
+</Update>
+
+<Update label="2024-08-10" description="v3.0.0" tags={["feature", "improvement"]}>
+## New Features
+
+- **Seven Hubs Launch**: Full integration of Home, Work, Money, Talent, Culture, and Growth surfaces.
+- **Free Tier Expansion**: Unlimited use for up to 5 users, no credit card required.
+
+## Improvements
+
+- Shared data model connects all signals for holistic insights.
+- Performance optimizations reduce tool sprawl from 15+ apps.
+</Update>
+
+## Upcoming Roadmap
+
+Track upcoming features and improvements in our public roadmap.
+
+<Board title="Q4 2024 Roadmap">
+  <BoardColumn title="Planned" color="0" icon="calendar">
+    <BoardCard title="Advanced Analytics" description="AI-driven forecasts for Growth hub" icon="trending-up" dueDate="2024-12-15" />
+    <BoardCard title="Vendor Management" description="Automated approvals in Money hub" icon="dollar-sign" dueDate="2024-12-01" />
+  </BoardColumn>
+  <BoardColumn title="In Progress" color="1" icon="loader-2">
+    <BoardCard title="Survey Tools" description="Anonymous feedback in Culture hub" icon="message-circle" author="Product Team" />
+  </BoardColumn>
+  <BoardColumn title="Completed" color="2" icon="check-circle">
+    <BoardCard title="v4 Relaunch" description="New UI and AI features" icon="zap" createdAt="2024-10-15" />
+  </BoardColumn>
+</Board>
+
+## Check for Updates
+
+Follow these steps to ensure you're on the latest version.
+
+<Steps>
+  <Step title="Log In" icon="log-in">
+    Visit [app.workwrk.com/login](https://app.workwrk.com/login).
+  </Step>
+  <Step title="View Changelog" icon="book-open">
+    Navigate to your profile menu and select `Changelog`.
+  </Step>
+  <Step title="Enable Notifications" icon="bell">
+    Turn on email or in-app alerts for new releases.
+  </Step>
+</Steps>
+
+## Next Steps
+
+<Columns cols={2}>
+  <Card title="Get Started" icon="rocket" href="/quickstart">
+    Set up your first hub in minutes.
+  </Card>
+  <Card title="Feature Requests" icon="sparkles" href="/feedback" target="_blank">
+    Suggest improvements via our portal.
+  </Card>
+</Columns>
+
+<Callout kind="tip">
+  Found a bug? Report it at support@workwrk.com. This changelog serves as a starter—customize for your releases.
+</Callout>
