@@ -11,7 +11,7 @@ Review cycles live at `/reviews`, listed in the app switcher as **Review cycles*
 
 Review cycle administration is the HR admin door: HR, Company Admin and Super Admin. Managers who open `/reviews` are redirected to Teams → Reviews. Everyone else is redirected to their own career home.
 
-Be aware of the consequence, because it bites: when a cycle launches, every employee gets a notification saying "please complete your self assessment" that links to `/reviews/{cycleId}`. Only HR and admins can open that page. Everyone else is bounced. **Today the self assessment form is only reachable by people who can already open the review cycle page.** Until that door is widened, plan on collecting self assessments another way, or run cycles where the participants hold HR or admin access.
+Be aware of the consequence, because it bites: when a cycle launches, every employee gets a notification saying "please complete your self assessment" that links to the cycle page. Only HR and admins can open that page. Everyone else is bounced. **Today the self assessment form is only reachable by people who can already open the review cycle page.** Until that door is widened, plan on collecting self assessments another way, or run cycles where the participants hold HR or admin access.
 
 ## Create a cycle
 
@@ -40,7 +40,7 @@ Click **Launch cycle** on the featured cycle at the top of the page, or **Launch
 
 Things to know before you press it:
 
-- Launch covers **every Active employee in the org**, not a selected group. There is no scoping or exclusion.
+- Launch covers **every Active employee in the org**, not a selected group. There is no scoping or exclusion. If you need a narrower audience, this is not the tool: a cycle is company wide by construction.
 - You can only launch once. If reviews already exist for the cycle, launch is refused with "Reviews already generated for this cycle. Delete existing reviews first." There is no delete-reviews control anywhere in the product, so in practice a launched cycle cannot be relaunched. Get the name, type and dates right before you press Launch.
 - You cannot launch a cycle that is in calibration, completed or cancelled.
 - A cycle cannot skip Draft by editing its status. The status change is rejected with "This cycle has no reviews yet. Launch it first." Launch is the only door out of Draft. Cancelling an unlaunched draft is still allowed.
@@ -113,11 +113,11 @@ One row per cadence: weekly check in, monthly pulse, quarterly review, annual ap
 
 Defaults are weekly, monthly and quarterly enabled with auto open on, and annual disabled.
 
-What auto open actually does: a daily cron scans every organization, and for each enabled cadence with auto open on whose anchor has landed in the current period, it makes sure a **Draft** ReviewCycle exists for that period and notifies the manager tier. It stops there. **A human still has to press Launch.** Auto open never generates anyone's review.
+What auto open actually does: a daily job (`/api/cron/review-cycles`) scans every organization, and for each enabled cadence with auto open on whose anchor has landed in the current period, it makes sure a **Draft** ReviewCycle exists for that period and notifies the manager tier. It stops there. **A human still has to press Launch.** Auto open never generates anyone's review.
 
-The weekly cadence is not handled by that cron. Weekly check ins are per person and created on demand.
+The weekly cadence is not handled by that job. Weekly check ins are per person and created on demand.
 
-This depends on the cron actually being registered on your server. `/api/cron/review-cycles` is listed in `vercel.json` as a reference schedule of once a day at 08:00, but WorkwrK runs on aaPanel and PM2, so the real schedule is whatever cron row exists on the box. Verify it there before relying on auto open.
+That job is registered in production and runs once a day at 08:00. Two caveats worth keeping in mind: the schedule lives on the server, not in the code, so if you run WorkwrK on your own infrastructure it does not travel with a deploy, and the `vercel.json` in the repository is reference-only rather than the live schedule.
 
 ### Score weights
 

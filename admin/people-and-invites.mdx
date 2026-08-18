@@ -1,6 +1,6 @@
 ---
 title: People and invites
-description: Invite someone into the workspace, find them in the directory and org chart, and remove them cleanly when they leave.
+description: Invite someone into the workspace, find them in the directory and org chart, tag them, and remove them cleanly when they leave.
 ---
 
 ## Invite someone
@@ -14,18 +14,18 @@ The modal collects:
 
 - **Email addresses**. It is a chip input, so you can paste or type several separated by commas, spaces or Enter. Anything that is not a valid email is flagged instead of silently dropped.
 - **Access level**. Every level except Super Admin, including Company Admin. See [Functions and levels](/admin/functions-and-levels).
+- **Department**, **Role** and **Reporting manager**, all marked optional. These place the hire so they do not arrive unassigned. Picking a Role also drives KRA-weight inheritance on accept (see below).
 - **KRAs**, at least one. Required.
 - **SOPs**, at least one. Required.
-- **Department, Role and Manager**, all optional. These place the hire so they do not arrive unassigned. Picking a Role also drives KRA-weight inheritance on accept (see below).
 - **Personal message**, optional, quoted inside the invitation email.
 
-The KRA and SOP requirement is enforced on the server, not just in the form. An invite without one of each is rejected. This is deliberate: nobody joins the workspace without a role definition. If your org has no KRAs or SOPs yet, the modal tells you and you have to create them first.
+The KRA and SOP requirement is enforced on the server, not just in the form. An invite without one of each is rejected, with "Pick at least one KRA before sending the invite — every new hire needs a role definition." or "Pick at least one SOP before sending the invite — every new hire needs starter SOPs to acknowledge.". This is deliberate: nobody joins the workspace without a role definition. If your org has no KRAs or SOPs yet, the modal tells you and you have to create them first.
 
 One request is sent per email address. Successes are counted in the confirmation toast. Failures (already invited, already a member, network error) stay in the chip row so you can fix and retry without retyping the rest.
 
 ### Placement is optional but built in
 
-The modal now has pickers for department, role and manager, so a hire can arrive already placed instead of landing unassigned. All three are optional: leave them blank and the person joins with no department, job title or manager, exactly as before, and you set those afterwards on their profile.
+The modal has pickers for department, role and reporting manager, so a hire can arrive already placed instead of landing unassigned. All three are optional: leave them blank and the person joins with no department, job title or manager, and you set those afterwards on their profile.
 
 Setting the Role at invite time carries through to accept, where it seeds the KRAs and SOPs from the job title's template and inherits the role's KRA weights. If you would rather do it later, open Teams → Directory after they accept, open their card, and set Department, Role and Manager there instead. See [Roles, KRAs and KPIs](/admin/roles-kras-kpis).
 
@@ -41,6 +41,8 @@ On accept, in a single transaction, WorkwrK:
 
 Because it is one transaction, a partial signup can never leave someone without their role definition.
 
+A new joiner closes out each assigned SOP from the SOP's own page, with the **Mark as read** button in the header. That is the acknowledgement the SOP read rate counts, and it works for people with no SOP management rights at all.
+
 ### Managing pending invites
 
 Settings → Members lists pending invitations under the member table, with the email, access level and how long ago it was sent. Each row has a revoke action. Accepted invitations cannot be revoked.
@@ -54,12 +56,13 @@ Teams → Directory (`/people`) is the who's who. It is a manager tier page. Emp
 The page gives you:
 
 - Stat tiles for headcount, departments, and joiners in the last 90 days.
-- Search across name, email, job title and department.
+- Search across name, email, job title, department and tag name.
 - Status tabs: All, Active, New, Former.
 - Department chips, derived from the people themselves rather than from the departments list.
-- Cards grouped by department, showing avatar, name, job title, department and office chips, manager, and tenure.
+- A **Tags** filter row, derived the same way from the tags people actually carry. Select one or more and the grid narrows to people carrying any of them, with a **Clear tags** control next to the row. The row hides itself when nobody is tagged, and on the Former tab.
+- Cards grouped by department, showing avatar, name, job title, department and office chips, manager, tenure, and up to four of the person's tags with a "+N" chip beyond that.
 
-What you see is scoped by your level. Company Admin, Super Admin, C-Level, VP, Director and HR see the whole organization. Team Leads and Managers see themselves plus their recursive report tree, and the server enforces that regardless of what the page asks for.
+What you see is scoped by your level. Company Admin, Super Admin, C-Level, VP, Director and HR see the whole organization. Team Leads and Managers see themselves plus their recursive report tree, and the server enforces that regardless of what the page asks for. The tag filter is applied on top of that scope, so it can only ever narrow what you were already allowed to see.
 
 Removed people never appear in headcount, department chips or the grouped grid. They live only in the **Former** tab, sorted by removal date, each with a one click **Restore**.
 
@@ -69,6 +72,23 @@ Two guardrails on that edit:
 
 - Only Company Admin and Super Admin can change an access level, and the last remaining Company Admin cannot be demoted.
 - Everyone else can only edit themselves or someone inside their report tree. Employees editing their own row are limited to personal fields, so nobody can promote themselves or reassign their own manager.
+
+## Tagging people
+
+Under the person's name on their profile sits a tag control. A manager (or an org-wide level) can add and remove tags there; on your own page you can read your tags but not change them, and a peer never sees them at all.
+
+The tags come from one shared org taxonomy created at **Settings → Tags**. That is also the only place a tag can be minted, and the page cannot rename or delete one against the server, so name them carefully.
+
+A person tag is not a permission. It is a segment, and four things read it:
+
+- The Directory's Tags filter.
+- A **Goal**, which can name a tag as a contributor.
+- A **pulse survey**, which can target a tag as its audience.
+- An **Announcement**, which can target a tag as its audience.
+
+In all four the membership is resolved live from the tag assignments, not frozen at the moment you created the goal or the survey. Tag someone next week and they are inside those audiences on the next read; untag them and they drop out. Archived tags never resolve.
+
+This is the tool for groups that are not a department and not a job title: a joiner cohort, a programme, a task force, a shift.
 
 ## The org chart
 
@@ -98,7 +118,7 @@ Removal is a soft delete. It sets `deletedAt` and flips their status to Inactive
 - An already open session stops working within five minutes. Their token is re checked against the database on that interval, and once it comes back removed the session is treated as signed out everywhere.
 - All their history survives: tasks, docs, reviews, KPI records, kudos. Nothing is deleted.
 - They disappear from headcount, the directory grid and department chips, and appear in the **Former** tab.
-- They stop inheriting anything. Role KRA fan out only reaches Active holders, and goal audiences skip them.
+- They stop inheriting anything. Role KRA fan out only reaches Active holders, goal audiences skip them, and a tag they still carry stops resolving them into any audience.
 
 The action is logged as `user_removed` with the actor.
 
