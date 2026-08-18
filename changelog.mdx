@@ -1,102 +1,102 @@
 ---
 title: Changelog
-description: Version history highlighting recent updates, new features, and improvements in Workwrk.
+description: Notable user-facing changes to WorkwrK, grouped by month.
 ---
 
-## Recent Updates
-
-Workwrk releases updates regularly to enhance your experience managing people, processes, and performance. Check the [app changelog](https://app.workwrk.com/changelog) or enable notifications to stay informed.
+WorkwrK ships continuously. There are no numbered releases to install or upgrade, so this page summarises the changes people actually notice, month by month, newest first. Work on the product started on 26 March 2026; the entries below begin with the first full month of building. Smaller fixes and internal refactors are not listed.
 
 <Callout kind="info">
-  Updates deploy automatically. Restart the app or refresh your browser to access new features.
+  Not everything named here is finished. [Status](/reference/status) is the honest per-area record of what is built, what is partial, and what is not there yet.
 </Callout>
 
-<Update label="2024-10-15" description="v4.0.0" tags={["feature", "breaking"]}>
-## New Features
+<Update label="2026-08" description="SOPs get a real editor and a real acknowledge loop; notifications and reminders finally fire" tags={["sops", "notifications", "reminders", "settings", "goals"]}>
 
-- **Marketing Relaunch**: Completely refreshed UI across all seven hubs (Home, People, Work, Money, Talent, Culture, Growth) with improved navigation and AI-powered insights.
-- **Composite Scores**: View team performance at a glance with on-track, in-review, and at-risk indicators.
-- **AI Cmd-K**: Natural language commands for quick actions like assigning tasks or sending kudos.
+## Added
 
-## Breaking Changes
+- **Four first-class SOP kinds.** `New SOP` now offers Written SOP, Step-by-step SOP, Checklist SOP and Click-capture SOP, and each one opens the editor that matches it. Written SOPs use the block editor and read like a note, instead of dropping into a step list they never wanted. Written SOPs also gained a description field under the title.
+- **SOPs close the loop.** People assigned an SOP can now mark it as read or acknowledge it from the SOP page and from `My SOPs`. Before this there was no way to complete an assignment, so the Compliance view could only ever show 0%. SOP pages also show which tasks reference them and let you link the SOP to a KRA.
+- **Audiences by tag.** A goal, a pulse survey or an announcement can be aimed at a tag instead of a fixed list of names. Tags resolve to whoever holds them at the moment of reading, so someone tagged later inherits the goal and an untagged person drops out. The People Directory gained a matching tag filter, tag chips on each person card, and tag names folded into search.
+- **Announcements target their audience for real.** The audience was being stored but never read, so every post went to the whole organisation. Announcements now reach only the departments, offices, people or tags they were addressed to, and the composer has a "Who sees this" picker.
+- **Settings has two doors.** The Settings takeover is split into an Admin section, gated to organisation admins, and a Personal section anyone can open for their own profile, notifications, appearance and security.
+- **The Notepad is personal.** Notes written in the topbar Notepad are anchored to you alone. They no longer appear in Docs, and organisation docs no longer appear in the Notepad.
 
-- Updated API endpoints for performance hubs; migrate to new `/v4/performance` paths.
+## Fixed
 
-## Improvements
+- **Task notifications actually send.** Creating a task for someone, reassigning it, or moving its status now writes a notification. The topbar bell is live with an unread badge, optional desktop alerts, and per-person Inbox and Email preferences that the sender respects.
+- **Reminders survive.** A fired reminder used to be a toast that vanished after a few seconds. It is now a persistent popup with Snooze, Dismiss and Open, the bell keeps a Fired section and a recent history, and the reminder job is scheduled so reminders fire even when nobody has the app open.
+- **The click-capture recorder stopped double-capturing.** Each click produced two screenshots and a full-page navigation could swallow the last step. Capture now happens on the click itself, steps are written before the screenshot resolves, and stopping the recording stops it in every tab.
 
-- Faster dashboard loading by `>50%`.
-- Enhanced mobile support for all surfaces.
+## Changed
+
+- **HR and payroll modules were removed.** Recruiting, Learning, employee onboarding, Time off, Payroll and Benefits, Expenses and Workforce planning are gone from the product. WorkwrK is a work-management and people-performance system, not an HRIS. No stored data was dropped in the process.
+
 </Update>
 
-<Update label="2024-09-20" description="v3.5.0" tags={["feature", "bugfix"]}>
-## New Features
+<Update label="2026-07" description="Lists gain their full set of views, tasks learn to repeat, and saving stops losing work" tags={["tasks", "docs", "whiteboards", "spaces"]}>
 
-- **Kudos System**: Instant recognition across teams with emoji reactions.
-- **Auto-task Assignment**: AI suggests and assigns tasks based on SOPs and KPIs.
-- **Multi-country Support**: Localized for 8+ countries with currency conversion in Money hub.
+## Added
 
-## Bug Fixes
+- **Every List gets List, Board, Calendar and Gantt.** The four views come with a List by default rather than having to be added one at a time, and Gantt surfaces tasks that have no dates yet.
+- **Schedule and Repeat on a task.** A task can carry a date, a reminder and a recurrence rule. When a recurring task is completed, a fresh copy is spawned for the next cycle, subtasks included, and a reminders bell sits in the top right.
+- **Per-Space modules.** Priority, Tags, Time Tracking and Custom Fields can be switched on or off for a Space, and the setting is respected everywhere: table columns, kanban cards, the task detail panel and the timer.
+- **Tasks can back a KRA or KPI.** A task can be linked to a KRA or a KPI from the create modal or the task detail panel, and the KRA/KPI page shows how much real work sits behind each metric.
+- **Docs rebuilt.** The Docs section shows the real Space, Folder or List each doc lives in, its filters and sort actually work, and video links play inline.
+- **Folders behave like folders.** A proper Create Folder dialog with a private option, a full right-click menu, drag reordering in the sidebar, and folders that open as their own page.
 
-- Fixed sync issues between People and Talent hubs.
-- Resolved composite score calculation errors for large teams.
+## Fixed
+
+- **Notes stop losing edits.** Nine confirmed paths where a note edit could be silently dropped were closed, including the first edit or paste after opening a note and the save that was pending when you navigated away.
+- **Whiteboards keep their work.** Whiteboards gained version history, so every save is recoverable, plus reliable autosave and fit-to-content when a board opens.
+
 </Update>
 
-<Update label="2024-08-10" description="v3.0.0" tags={["feature", "improvement"]}>
-## New Features
+<Update label="2026-06" description="The work structure lands: Spaces, Folders, Lists and Boards, with Settings, Trash and the quick tools around it" tags={["spaces", "views", "settings", "trash"]}>
 
-- **Seven Hubs Launch**: Full integration of Home, Work, Money, Talent, Culture, and Growth surfaces.
-- **Free Tier Expansion**: Unlimited use for up to 5 users, no credit card required.
+## Added
 
-## Improvements
+- **Spaces, Folders, Lists and Boards** became the structure the whole product hangs from, with per-List statuses, a real Create List modal, drag and drop in the sidebar, and every view type in the picker rendering something real.
+- **Task types and a Template Center.** Tasks can carry a type, and templates for tasks, Lists and Spaces can be saved and applied from the create menus.
+- **Settings became a full-screen workspace** with Members, Roles and permissions, Reporting hierarchy, scoped KRA and SOP assignment, and SOP publishing rights.
+- **One Trash for everything.** Deleting a task, note, whiteboard, doc or contract sends it to a single workspace Trash, restorable for 60 days, with storage reclaimed on permanent deletion.
+- **Quick tools in the topbar**: a quick task, a My Work panel, the sticky Notepad, reminders that fire, and on-device voice-to-text.
+- **Planner**, a personal time-grid calendar with drag-to-create, replaced the older calendar surfaces.
+- **Contracts and policies.** Contracts got templates, folders and e-signature; policies got assignment, acknowledgement and automatic version control.
+- **Databases grew up.** Table columns can now link to another table, look up and roll up values, hold attachments or people, run formulas, and be saved as named views including a Gallery.
 
-- Shared data model connects all signals for holistic insights.
-- Performance optimizations reduce tool sprawl from 15+ apps.
+## Changed
+
+- **The industry suites were removed.** CRM, ITSM, Helpdesk, Legal, Dev, Finance, Planning and Procurement page trees were deleted so the product could focus on work management and the people layer around it.
+
 </Update>
 
-## Upcoming Roadmap
+<Update label="2026-05" description="The Work OS shell, board views, and the document and canvas primitives" tags={["shell", "views", "docs", "ai"]}>
 
-Track upcoming features and improvements in our public roadmap.
+## Added
 
-<Board title="Q4 2024 Roadmap">
-  <BoardColumn title="Planned" color="0" icon="calendar">
-    <BoardCard title="Advanced Analytics" description="AI-driven forecasts for Growth hub" icon="trending-up" dueDate="2024-12-15" />
-    <BoardCard title="Vendor Management" description="Automated approvals in Money hub" icon="dollar-sign" dueDate="2024-12-01" />
-  </BoardColumn>
-  <BoardColumn title="In Progress" color="1" icon="loader-2">
-    <BoardCard title="Survey Tools" description="Anonymous feedback in Culture hub" icon="message-circle" author="Product Team" />
-  </BoardColumn>
-  <BoardColumn title="Completed" color="2" icon="check-circle">
-    <BoardCard title="v4 Relaunch" description="New UI and AI features" icon="zap" createdAt="2024-10-15" />
-  </BoardColumn>
-</Board>
+- **A new app shell.** The left rail plus sidebar layout, a workspace switcher, a command palette, an Inbox, Favorites and an apps panel replaced the old dashboard chrome.
+- **Board views.** A reusable board with Table and Kanban, inline cell editing, column sort, search and filter, multi-select bulk actions, a row detail drawer and multi-tab saved views.
+- **Docs, Whiteboards, Files, Forms and Tables** arrived as building blocks that any page can use, with a full-screen doc editor and version history, an infinite whiteboard canvas, folder-based file storage, and forms that feed a table or a board.
+- **AI Sidekick and agents.** A real chat runtime, prebuilt agents that can take actions in the product, and a meeting notetaker that turns a transcript into structured notes.
+- **Time tracking** with start and stop sessions on an item, and a dark theme refresh including a true-black Night mode.
 
-## Check for Updates
+</Update>
 
-Follow these steps to ensure you're on the latest version.
+<Update label="2026-04" description="The people, performance and process foundations" tags={["people", "kra-kpi", "sops", "engagement"]}>
 
-<Steps>
-  <Step title="Log In" icon="log-in">
-    Visit [app.workwrk.com/login](https://app.workwrk.com/login).
-  </Step>
-  <Step title="View Changelog" icon="book-open">
-    Navigate to your profile menu and select `Changelog`.
-  </Step>
-  <Step title="Enable Notifications" icon="bell">
-    Turn on email or in-app alerts for new releases.
-  </Step>
-</Steps>
+## Added
 
-## Next Steps
+- **People and structure.** A people list and profiles, departments, roles and offices created inline, a reporting-manager hierarchy, and an org chart you can pan and zoom.
+- **KRAs and KPIs.** Multi-KRA assignment with weightage, monthly and quarterly periods, metrics where a lower number is better, managed KRA categories, and AI-assisted drafting of KRAs and KPIs from your company context.
+- **SOPs.** Written and checklist SOPs with a rich-text editor, a browser recorder that captures a screenshot and a step for each click, SOP folders, and drag or arrow reordering of steps.
+- **The engagement set.** OKRs, Ideas, Announcements with must-acknowledge posts, Policies, Kudos, and Candor for anonymous team feedback.
+- **Pulse surveys** with poll-style question types, an anonymous option, deadlines, recurring cycles and pre-close reminders.
+- **Access control.** Granular role-based permissions, a team members list with inline access levels, and invitation rights extended to managers rather than admins alone.
+- **Notifications and email.** In-app notifications with unread badges, a queued email pipeline behind them, and desktop notifications.
 
-<Columns cols={2}>
-  <Card title="Get Started" icon="rocket" href="/quickstart">
-    Set up your first hub in minutes.
-  </Card>
-  <Card title="Feature Requests" icon="sparkles" href="/feedback" target="_blank">
-    Suggest improvements via our portal.
-  </Card>
-</Columns>
+</Update>
 
-<Callout kind="tip">
-  Found a bug? Report it at support@workwrk.com. This changelog serves as a starter—customize for your releases.
-</Callout>
+## How updates reach you
+
+WorkwrK is hosted at [workwrk.com](https://workwrk.com) and deployed continuously. There is nothing to download, install or upgrade, and no version to pin. When a change ships it is live on the next page load, so if something looks stale, reload the browser to pick up the newest build.
+
+If a page here does not match what you see in the product, trust the product and tell your workspace admin. These pages are corrected against the code, not the other way round.
