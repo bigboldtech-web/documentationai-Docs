@@ -1,12 +1,8 @@
 {
-  "name": "Workwrk",
+  "name": "Cashkr",
   "colors": {
-    "light": {
-      "brand": "#0073EA"
-    },
-    "dark": {
-      "brand": "#4DA3F5"
-    }
+    "light": { "brand": "#16A34A" },
+    "dark": { "brand": "#4ADE80" }
   },
   "navigation": {
     "tabs": [
@@ -18,185 +14,29 @@
             "group": "Getting Started",
             "icon": "rocket",
             "pages": [
-              {
-                "title": "Introduction",
-                "path": "introduction",
-                "icon": "home"
-              },
-              {
-                "title": "Core concepts",
-                "path": "getting-started/core-concepts",
-                "icon": "compass"
-              },
-              {
-                "title": "First week setup",
-                "path": "getting-started/first-week-setup",
-                "icon": "list-checks"
-              }
+              { "title": "Introduction", "path": "introduction", "icon": "home" },
+              { "title": "How selling works", "path": "how-it-works", "icon": "route" }
             ]
           },
           {
-            "group": "Using WorkwrK",
-            "icon": "layers",
+            "group": "Selling your device",
+            "icon": "smartphone",
             "pages": [
-              {
-                "title": "Spaces and tasks",
-                "path": "using/spaces-and-tasks",
-                "icon": "square-check"
-              },
-              {
-                "title": "Views",
-                "path": "using/views",
-                "icon": "table"
-              },
-              {
-                "title": "Docs and library",
-                "path": "using/docs-and-library",
-                "icon": "file-text"
-              },
-              {
-                "title": "Goals",
-                "path": "using/goals",
-                "icon": "target"
-              },
-              {
-                "title": "My profile",
-                "path": "using/my-profile",
-                "icon": "user"
-              },
-              {
-                "title": "Time and search",
-                "path": "using/time-and-search",
-                "icon": "timer"
-              }
+              { "title": "Devices we buy", "path": "devices", "icon": "laptop" },
+              { "title": "Pricing and quotes", "path": "pricing-and-quotes", "icon": "badge-indian-rupee" },
+              { "title": "Pickup and payment", "path": "pickup-and-payment", "icon": "truck" },
+              { "title": "Your data, wiped", "path": "data-safety", "icon": "shield-check" }
             ]
           },
           {
-            "group": "Administration",
-            "icon": "settings",
+            "group": "Help Center",
+            "icon": "life-buoy",
             "pages": [
-              {
-                "title": "Functions and levels",
-                "path": "admin/functions-and-levels",
-                "icon": "network"
-              },
-              {
-                "title": "Roles, KRAs and KPIs",
-                "path": "admin/roles-kras-kpis",
-                "icon": "gauge"
-              },
-              {
-                "title": "People and invites",
-                "path": "admin/people-and-invites",
-                "icon": "user-plus"
-              },
-              {
-                "title": "Reviews and cadences",
-                "path": "admin/reviews-and-cadences",
-                "icon": "calendar-check"
-              },
-              {
-                "title": "Settings",
-                "path": "admin/settings",
-                "icon": "sliders-horizontal"
-              }
+              { "title": "Help Center", "path": "help-center", "icon": "help-circle" },
+              { "title": "Getting paid", "path": "help-center/faq/getting-paid", "icon": "wallet" },
+              { "title": "Device conditions", "path": "help-center/faq/device-conditions", "icon": "wrench" },
+              { "title": "Reschedule a pickup", "path": "help-center/troubleshooting/reschedule-pickup", "icon": "calendar-clock" }
             ]
-          },
-          {
-            "group": "Reference",
-            "icon": "book-open",
-            "pages": [
-              {
-                "title": "How it connects",
-                "path": "reference/how-it-connects",
-                "icon": "git-branch"
-              },
-              {
-                "title": "Visibility and permissions",
-                "path": "reference/visibility-and-permissions",
-                "icon": "shield-check"
-              },
-              {
-                "title": "Status",
-                "path": "reference/status",
-                "icon": "activity"
-              },
-              {
-                "title": "Glossary",
-                "path": "reference/glossary",
-                "icon": "book-a"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "icon": "code",
-        "groups": [
-          {
-            "group": "Endpoints",
-            "icon": "terminal",
-            "openapi": "api-reference/openapi.yaml",
-            "pages": []
-          }
-        ]
-      },
-      {
-        "tab": "Help Center",
-        "icon": "help-circle",
-        "pages": [
-          {
-            "title": "Help Center",
-            "path": "help-center",
-            "icon": "home"
-          },
-          {
-            "group": "FAQs",
-            "icon": "help-circle",
-            "expandable": false,
-            "pages": [
-              {
-                "title": "How to Invite Team",
-                "path": "help-center/faq/how-to-invite-team",
-                "icon": "help-circle"
-              }
-            ]
-          },
-          {
-            "group": "Troubleshooting",
-            "icon": "alert-triangle",
-            "expandable": false,
-            "pages": [
-              {
-                "title": "Cannot Assign Task",
-                "path": "help-center/troubleshooting/cannot-assign-task",
-                "icon": "alert-circle"
-              }
-            ]
-          },
-          {
-            "group": "Guides",
-            "icon": "book-open",
-            "expandable": false,
-            "pages": [
-              {
-                "title": "Create Project",
-                "path": "help-center/guides/create-project",
-                "icon": "book-open"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Changelog",
-        "icon": "clock",
-        "pages": [
-          {
-            "title": "Release History",
-            "path": "changelog",
-            "icon": "history"
           }
         ]
       }
