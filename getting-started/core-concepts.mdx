@@ -61,8 +61,9 @@ Tasks also support:
 - **Comments and an activity log.** Comments are rich text; the activity log is written automatically when a task is created, patched, or archived, so a status change shows as "changed status from To Do to In Progress".
 - **Time tracking.** Timer sessions are per-user, so two people can run timers on the same task without conflict.
 - **Checklists and subtasks** inside the task detail panel.
-- **Recurrence.** A series anchor task carries a repeat rule and a next-spawn date. A scheduled job (`/api/cron/recurring-tasks`) claims due anchors, clones the task and its subtask tree as a fresh open task, and advances the anchor. Spawned copies never become anchors themselves, so a series cannot run away. Whether the spawning actually happens depends on that cron being registered on the deployment you are using; verify it before relying on recurrence in production.
+- **Recurrence.** A series anchor task carries a repeat rule and a next-spawn date. A scheduled job (`/api/cron/recurring-tasks`) claims due anchors, clones the task and its subtask tree as a fresh open task, and advances the anchor. Spawned copies never become anchors themselves, so a series cannot run away. That job runs hourly in production; if you are running WorkwrK somewhere else, the schedule does not come with the code, so check it before relying on recurrence.
 - **An alignment tag.** The create-task modal and the task detail panel both carry a control that stamps a KRA or a KPI onto the task. This is the first joint between the two structures.
+- **Linked objects.** The linked-attachments panel on a task attaches existing Notes, Whiteboards, Tables, Files and **SOPs**. The SOPs section is link-only: you attach a procedure that already exists, and the SOP's own page then lists this task under **Used by tasks**. This is the second joint.
 
 A task opens in a side drawer from a List, or full page at `/item/<id>`, which is the shareable URL. `/everything` shows every task you can read across every List in the org, grouped by status.
 
@@ -122,14 +123,15 @@ Function (Department)
                                         ▼
                                 Goal (OKR)
                             one accountable owner (a person)
-                            many contributors (people, departments, roles)
+                            many contributors
+                            (people, departments, roles, tags)
 ```
 
 ### Function (Department)
 
 A **Function** is a Department. The Departments page calls them departments; the Role definition page calls the same field "Function". A department has a name, an optional description, colour, an optional parent department (so functions nest), an optional head, and members.
 
-Departments are found at **People → Departments**, reachable from the Roles page header.
+Departments are found at **People → Departments**, reachable from the Roles page header. The page does full CRUD: create, rename, edit description and colour, assign a head, re-parent, and delete. The server refuses to delete a department that still has members, so reassign people first. Merge and archive are the two operations that do not exist.
 
 ### Role (job title)
 
@@ -170,7 +172,7 @@ A **KRA** is a permanent area of responsibility. It has no number and no date. "
 
 The convention is that a Role's KRA weights should total 100. The Role page shows a running "weight N% of 100" chip that turns red past 100.
 
-**Honest note:** the total is a convention, not a rule. Each individual weight is validated to be a finite number between 0 and 100. Nothing on the server refuses a Role whose weights sum to 80 or 130.
+**Honest note:** the total is a convention, not a rule. Each individual weight is validated (0 to 100 on the role-level KRA, 1 to 100 on a person's assignment) and that bound is a hard reject. The **total** is not. A save that takes a role, or a person, past 100 goes through and hands back an advisory warning naming the running total, instead of refusing. That is deliberate: refusing would trap someone already over budget so they could never save the very edit that rebalances them. Nothing requires a total to reach 100 either, so a role legitimately sitting at 80 is not an error.
 
 ### KPI (the gauge)
 
@@ -198,13 +200,30 @@ Readings are recorded per person, per period, as KPI records. A person records t
 
 KRAs that belong to no job title are not hidden or auto-assigned. They are surfaced in a separate "Needs a job title" section so an admin can attach them.
 
+### Tags: the fourth way to name a group of people
+
+Function, Role and reporting line are all structural. A **tag** is the flat, ad-hoc alternative, and it now matters enough to sit in this chapter.
+
+Tags come from one shared org taxonomy, created at **Settings → Tags**. The same tag can be stuck on a task, a SOP, or a **person**. You attach a person-tag from the tag control under their name on their profile; a manager edits it, and you can read your own.
+
+What a person-tag does once it exists:
+
+- The **Directory** (`/people`) grows a Tags filter row, and selecting tags narrows it to people carrying any of them.
+- A **Goal** can name a tag as a contributor.
+- A **pulse survey** can target a tag as its audience.
+- An **Announcement** can target a tag as its audience.
+
+In every case the membership is resolved from the live tag assignments at read time, so tagging someone tomorrow puts them inside the audience without anyone editing the goal, the survey or the announcement. Archived tags never resolve.
+
+A tag is not a permission and not a department. It decides who something is aimed at, not what anyone is allowed to open, and someone can carry as many as you like.
+
 ### Goals attach to a person
 
 A **Goal** (an OKR in the schema) is temporary and time-boxed, and it is the opposite of a KRA in every respect: it has a number, it has an end date, and **it attaches to a person, not to a job title.**
 
 - **One owner.** `ownerId` is the single accountable person, the DRI. One neck.
-- **Many contributors.** The contributors list is an audience, and each entry is exactly one of a person, a department, or a role. Many hands.
-- **Contributors resolve at read time.** A department or role contributor is stored as the department or the role, never as a frozen list of names. Membership is recalculated on every read, so a new hire inherits their team's goals and a leaver drops out automatically. Only active, non-deleted users ever resolve.
+- **Many contributors.** The contributors list is an audience, and each entry is exactly one of a person, a department, a role, or a tag. Many hands.
+- **Contributors resolve at read time.** A department, role or tag contributor is stored as the department, the role or the tag, never as a frozen list of names. Membership is recalculated on every read, so a new hire inherits their team's goals and a leaver drops out automatically. Only active, non-deleted users ever resolve.
 - **One shared progress number.** Everyone looking at the goal sees the same number.
 
 Goals have a level (Company, Department, Individual), a quarter, a check-in cadence (weekly, biweekly, monthly, or none, where none silences that goal's check-in reminders), and can nest under a parent goal.
@@ -219,7 +238,7 @@ Progress is **derived on read, never trusted from the stored column**, so the sa
 
 Unmeasured children contribute nothing to their parent, so three empty sub-goals cannot drag a measured sibling's 60% down to 15%.
 
-Key Result progress is direction-aware. A "reduce it" Key Result, where the target is below the start value, makes progress rise as the number falls, so hitting the target reads as roughly 100% rather than 0%.
+Key Result progress runs from the Key Result's **start** value toward its target value, and it is direction-aware. A "reduce it" Key Result, where the target is below the start value, makes progress rise as the number falls, so hitting the target reads as roughly 100% rather than 0%.
 
 ### The joint: a Key Result measured by a KPI
 
@@ -227,7 +246,7 @@ A Key Result can point up at a role-level KPI. When it does, its current value i
 
 Checking in by hand on a linked Key Result is refused with a 409 and an explanation: record the KPI reading instead. That refusal is the point. It stops the quarterly target and the permanent gauge from drifting apart.
 
-**Honest note:** there is no picker in the UI that creates this link today. The API accepts `kpiId` when creating or updating a Key Result, the goal detail page renders "measured by KPI · `<name>`" on linked targets, and the check-in route enforces the rule correctly. But to create the link you currently have to call the API.
+**Honest note:** there is no picker in the UI that creates this link today. The API accepts `kpiId` when creating or updating a Key Result, the goal detail page labels linked targets "measured by KPI" followed by the gauge's name, and the check-in route enforces the rule correctly. But to create the link you currently have to call the API.
 
 ---
 
@@ -248,7 +267,7 @@ The report tree is computed from `managerId` with a recursive query, so it inclu
 Two extra rules narrow specific actions:
 
 - **Deleting a goal** is tighter than editing one. The org-wide door narrows to Company Admin and Super Admin: a Director can edit a goal but cannot wipe it. The owner and a tree-manager of the owner may delete. The UI only shows the Delete control when the API will honour it.
-- **Employment fields** (status, department, role, manager, office) are a management decision. An employee editing their own profile is limited to personal fields, name, phone, avatar, date of birth, and gets a "Ask your manager to change: ..." error otherwise.
+- **Employment fields** (status, department, role, manager, office) are a management decision. An employee editing their own profile is limited to personal fields, name, phone, avatar, date of birth, and gets a "Ask your manager to change" error otherwise.
 
 Company Admin cannot be demoted if they are the last one.
 
@@ -258,9 +277,9 @@ Manager-tier pages redirect employees rather than erroring. Hitting `/team`, `/o
 
 `/people/<id>` renders one of three ways, decided server-side before the page loads:
 
-- **Self**: your own career home. Your job title, your inherited KRAs with your KPI readings, the control to record your own numbers, your goals, your reviews, your assets.
-- **Manage**: what a manager in your line, or an org-wide level, sees. The same narrative plus the manage actions: Edit profile, manage alignment, record numbers on the person's behalf.
-- **Peer**: a minimal directory card, name, title, department and manager. Never KPI readings, reviews or scores.
+- **Self**: your own career home. Your job title, your inherited KRAs with your KPI readings, the control to record your own numbers, your goals, your reviews, your assets, and your tags read-only.
+- **Manage**: what a manager in your line, or an org-wide level, sees. The same narrative plus the manage actions: Edit profile, manage alignment, record numbers on the person's behalf, edit their tags.
+- **Peer**: a minimal directory card, name, title, department and manager. Never KPI readings, reviews, scores or tags.
 
 `/people/me` is the stable URL to your own page; it resolves your session and forwards to `/people/<your id>` in self mode.
 
@@ -281,6 +300,7 @@ Company Admin and Super Admin are deliberately excluded from the **Role** level 
 | Function | Department |
 | Level | The fixed access ladder: Agent, Employee, Team Lead, Manager, Director, VP, C-Level, HR, plus Company Admin and Super Admin |
 | Role | Job title |
+| Tag | A label from one shared taxonomy. On a person it is a segment: filter the Directory by it, or aim a goal, survey or announcement at it |
 | List / Board | The container tasks live in (same object; URL says `boards`) |
 | Task / Item | A row in a List |
 | Target | A Key Result on a goal |
