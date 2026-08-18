@@ -19,11 +19,13 @@ By the end of the week you should be able to open any person's profile and see: 
 
 **Where:** People → Roles → **Departments** in the header, or go straight to `/people/departments`.
 
-Click **New department**, type the name, and it is created. The page shows a tree with headcount per department, a "with head" and "vacant head" count, and a search box.
+Click **New department** and fill in the dialog: a name, and optionally a description, a colour, a department head and a parent department. The page shows a tree with headcount per department, a "with head" and "vacant head" count, and a search box, plus a Grid toggle.
+
+Department names are unique per organization, so a second department with the same name fails to create.
 
 **What this unlocks:** a Function is the container you will hang job titles from. Goals can be assigned to a whole department as a contributor group, and that assignment resolves to today's members on every read, so a new hire inherits the department's goals automatically.
 
-**What does not work yet, so plan around it:** the page is create-and-view only. There is no rename, no head assignment, no re-parenting, no delete, and no merge in the UI. Nested departments render correctly if the parent link exists, but you cannot set the parent from this page. **Name your departments correctly the first time**, because fixing a typo currently means going through the API.
+**What you can change later:** everything except the two operations below. The page does full CRUD now: rename, edit the description and colour, assign or change the head, re-parent into a nested tree, and delete. The server refuses to delete a department that still has members, so reassign people first. **Merge and archive are the only operations that do not exist**, so if you end up with two departments that should be one, you move the people across by hand and delete the empty one.
 
 ---
 
@@ -37,11 +39,13 @@ On the Role's page, fill in:
 
 - **Mission**: one line saying what this role must ensure. This is stored as the role description.
 - **Function**: pick the department. This is the field that says "Sales" or "Operations".
-- **Level**: pick from the access ladder (C-Level, VP, Director, Manager, Team Lead, HR, Employee, Agent). Company Admin and Super Admin are deliberately not offered here.
+- **Level**: pick from the access ladder (C-Level, VP, Director, Manager, Team Lead, HR, Employee). Agent, Company Admin and Super Admin are deliberately not offered here.
 
 **What this unlocks:** everything downstream. KRAs attach to Roles, people attach to Roles, and the Role's Level is the default access level for its holders.
 
 Create a Role for every distinct job you have, including yours. Two people doing genuinely different jobs need two Roles even if they report to the same manager.
+
+**Get the title right the first time.** There is no rename control and no delete control for a role anywhere in the product.
 
 ---
 
@@ -57,13 +61,14 @@ For each result area this job owns:
 
 Aim for the weights to total 100. The card shows a live "weight N% of 100" chip which turns red above 100.
 
-**Honest note:** nothing stops you saving a role whose weights sum to 80 or 130. Each individual weight is validated to be between 0 and 100; the total is a convention the UI nudges you toward, not a server rule. Check the chip before you move on.
+**Honest note:** nothing stops you saving a role whose weights sum to 80 or 130. Each individual weight is validated to be between 0 and 100 and that bound is a hard reject; the total is not. A save that takes the job title past 100 goes through and returns an advisory warning naming the running total, rather than refusing. Check the chip before you move on.
 
 **What this unlocks:**
 
 - **Inheritance.** Every person who already holds this job title inherits the KRA the moment you add it, at the weight you set. It is not only applied to future hires.
 - **Per-person weights.** Each holder gets their own assignment row starting at the role weight, editable per person afterwards.
 - **A place to hang gauges.** KPIs live under KRAs.
+- **A place to hang procedures.** SOPs attach to a KRA, and published ones under a role's KRAs are assigned automatically to its holders.
 - **The invite gate.** You cannot send an invitation until at least one KRA exists to attach to it.
 
 If you already have KRAs floating around that belong to no job title, they show up in a **"Needs a job title"** section on the KRAs & KPIs page. Attach them; they are never auto-assigned or deleted.
@@ -93,11 +98,20 @@ For each gauge, set:
 
 ## Step 5: create at least one SOP
 
-**Where:** SOPs in the app rail, then **New SOP** (`/sops/new`). You pick one of three types: a written SOP, a checklist SOP, or a click-capture SOP.
+**Where:** SOPs in the app rail, then **New SOP** (`/sops/new`).
+
+The picker offers four kinds, and the choice is made once at creation:
+
+- **Written SOP**: long-form prose in the block editor, with its own description field. Best for policies and runbooks.
+- **Step-by-step SOP**: an ordered list of steps with per-step notes and screenshots. Reads like a recipe.
+- **Checklist SOP**: discrete steps someone ticks off, and the only kind that runs as a process run with a share link.
+- **Click-capture SOP**: click through the task and the recorder extension writes a screenshot and a step for each click.
+
+Once it exists, two things are worth doing straight away: set its **Linked KRA** on the detail page so it flows with the job title, and **Publish** it, because only Published SOPs auto-assign to a role's holders.
 
 **Why it is in the setup path:** the invitation API refuses to send an invite without at least one SOP selected, with the message "Pick at least one SOP before sending the invite". If your org has no SOPs, you cannot invite anyone. Create at least one before you get to step 6.
 
-This documentation deliberately does not describe the rest of the SOP module. Read the SOPs section when it is written rather than assuming behaviour from this page.
+Assignees close a SOP out with the **Mark as read** button in its header, which acknowledges it and completes their assignment. That acknowledgement is what the SOP read rate on the team alignment board counts.
 
 ---
 
@@ -109,21 +123,22 @@ The modal collects:
 
 - **Emails**: a chip input, comma, space or Enter separated. One invitation is sent per email.
 - **Access level**: from the ladder. Super Admin is never offered.
+- **Department**, **Role** and **Reporting manager**: all optional, and all carried on the invitation so the hire lands placed instead of floating.
 - **KRAs**: pick at least one. Required.
 - **SOPs**: pick at least one. Required.
 - **Personal message**: optional, quoted in the invite email.
 
 When the person accepts, their user record is created and their chosen KRAs and SOPs are materialised as assignment rows in the same transaction, so a partial signup can never leave someone without a role definition. Each KRA's role-level weight is inherited when it is set; KRAs with no weight fall back to an even split across the selected KRAs.
 
-**Honest note, and the reason for step 7:** the invite modal does **not** collect department, role, or manager. The API accepts all three, but there are no pickers in the modal today. Every person you invite this way arrives unplaced.
+**Set the Role in the modal if you can.** It is what makes the KRA weights inherit properly at accept time. If you leave the placement fields blank, step 7 becomes mandatory for that person.
 
 ---
 
-## Step 7: place each person into their job title, function and reporting line
+## Step 7: check each person is placed into their job title, function and reporting line
 
 **Where:** People → Directory, open the person, then **Edit profile**. The button appears only when you are a manager in their line or an org-wide level; peers see a minimal card with no edit control.
 
-Set:
+Set, or confirm:
 
 - **Department** (their function)
 - **Role** (their job title)
@@ -143,7 +158,19 @@ Check your work at People → Org chart (`/organization`).
 
 ---
 
-## Step 8: set goals
+## Step 8: tag the cross-cutting groups (optional, but do it before step 9)
+
+**Where:** create the tags at Settings → Tags, then attach them from the tag control under a person's name on their profile.
+
+Structure covers "which department" and "which job title". Tags cover everything that cuts across both: a cohort ("Q3 joiners"), a programme ("Onboarding"), a location shift, a task force.
+
+**What this unlocks:** a tag can be the audience of a goal, a pulse survey or an announcement, and it filters the Directory. Membership is resolved live from the tag assignments, so someone tagged next month lands inside those audiences automatically, and someone untagged drops out.
+
+**Honest note:** Settings → Tags creates tags and nothing else. It never calls the rename or delete endpoints, and its delete control only removes the row from the screen you are looking at. Name them correctly the first time.
+
+---
+
+## Step 9: set goals
 
 **Where:** Goals in the app rail (`/okrs`), or **New Goal**.
 
@@ -151,18 +178,18 @@ For each goal:
 
 1. **Name** it.
 2. **Owner**: the single accountable person. One neck. Only manager tiers can assign a goal to someone else; an employee's goals are owned by themselves.
-3. **Contributors**: add people, whole departments, or whole roles. Department and role contributors resolve to their current members on every read, so you do not have to maintain the list as the team changes.
+3. **Contributors**: add people, whole departments, whole roles, or a tag. Department, role and tag contributors resolve to their current members on every read, so you do not have to maintain the list as the team changes.
 4. **Level**: Company, Department or Individual.
 5. **Quarter and dates.**
 6. **Check-in cadence**: weekly, biweekly, monthly, or none. None silences that goal's check-in reminders.
 
-Then open the goal and add **Targets** (Key Results) on the goal detail page: title, start value, target value, and an optional unit. Progress rolls up from the targets automatically, and a goal with nothing measurable shows a dash rather than a fake 0%.
+Then open the goal and add **Targets** (Key Results) on the goal detail page: title, start value, target value, and an optional unit. Progress runs from the start value toward the target and rolls up from the targets automatically, and a goal with nothing measurable shows a dash rather than a fake 0%.
 
-**Honest note:** linking a target to a KPI, so its number comes from the gauge instead of from hand check-ins, has no picker in the UI. The API supports it and the goal page displays "measured by KPI · `<name>`" for linked targets, but you cannot create the link from a screen today.
+**Honest note:** linking a target to a KPI, so its number comes from the gauge instead of from hand check-ins, has no picker in the UI. The API supports it and the goal page labels linked targets "measured by KPI" with the gauge's name, but you cannot create the link from a screen today.
 
 ---
 
-## Step 9: start the work structure
+## Step 10: start the work structure
 
 Alignment is now standing up. Now build where the work goes.
 
@@ -170,17 +197,17 @@ Alignment is now standing up. Now build where the work goes.
 2. **Add Folders** inside the Space if you need a middle grouping. They nest up to 6 levels. Folders are optional; a List can hang straight off a Space.
 3. **Create Lists** inside the Space or Folder. This is where tasks live.
 4. **Set up each List**: its statuses, its custom fields, and its views. Add views from the "+ View" control: Table, Board, Calendar, Gantt, Timeline, Workload, Cards, Hierarchy, Pivot, Chart, Dashboard, Form, Doc, Whiteboard, File gallery, Map, Activity.
-5. **Tag work to alignment** as you create tasks. The create-task modal and the task detail panel both carry a control that attaches a KRA or a KPI to the task.
+5. **Tag work to alignment** as you create tasks. The create-task modal and the task detail panel both carry a control that attaches a KRA or a KPI to the task, and the task detail's SOPs section links the procedure that says how the work is done.
 
 ---
 
-## Step 10: turn on the measurement rhythm
+## Step 11: turn on the measurement rhythm
 
 Once people are placed and gauges exist, the recurring loop is:
 
 - **Each person records their own numbers.** People → My Profile → **Record my numbers**. Available to anyone with at least one KRA.
 - **Managers review them.** KRAs & KPIs → **Review** (`/kra-kpi/review`) lists your direct reports down the left with a status dot each (all scored, some pending, nothing yet), and puts the selected person's KPIs on rows with target, actual, a manager note and a score. A period toggle at the top switches the review cadence between week, month and quarter. Approvals also surface at Teams → KPI approvals.
-- **Goal owners check in** on their targets at the goal's cadence.
+- **Goal owners check in** on their targets at the goal's cadence. A goal that goes past its cadence without a check-in nudges the owner in the notifications bell and by email, from a job that runs on weekday mornings.
 
 ---
 
@@ -188,14 +215,15 @@ Once people are placed and gauges exist, the recurring loop is:
 
 Copy this into a task list and work down it.
 
-- [ ] Functions (departments) created, named correctly the first time
-- [ ] A Role exists for every distinct job, each with mission, function and level filled in
+- [ ] Functions (departments) created
+- [ ] A Role exists for every distinct job, each with mission, function and level filled in, and each titled correctly (there is no rename)
 - [ ] Every Role has its KRAs, with weights that total 100 (verify the chip)
 - [ ] Every KRA has at least one KPI, with a written definition, unit, target, direction, and an honest Owned/Shared setting
-- [ ] At least one SOP exists (required before any invite will send)
-- [ ] Everyone invited
-- [ ] Everyone placed: department, role, access level, and **Reports To** set on each profile
+- [ ] At least one SOP exists, published, and linked to a KRA (required before any invite will send)
+- [ ] Everyone invited, with department, role and manager set in the modal where you knew them
+- [ ] Everyone placed: department, role, access level, and **Reports To** confirmed on each profile
 - [ ] Org chart looks right at `/organization`
+- [ ] Cross-cutting tags created and attached to the right people
 - [ ] Goals created with a single owner and resolved contributors, with targets added
 - [ ] Spaces, Folders and Lists created; statuses, fields and views configured
 - [ ] First KPI recording period run end to end, recorded and reviewed
@@ -206,8 +234,9 @@ Copy this into a task list and work down it.
 
 These are real limits in the current build, not things you are doing wrong:
 
-- The Departments page cannot rename, re-parent, assign a head to, or delete a department.
-- The invite modal cannot set department, role, or manager, so step 7 is mandatory for every hire.
-- KRA weights are not forced to total 100 on the server.
+- Departments cannot be merged or archived, only deleted once empty.
+- A Role cannot be renamed or deleted from the interface.
+- KRA weight totals are not enforced on the server, for a role or for a person. You get a warning, not a refusal.
 - The KPI editor has no frequency control, so every KPI created there is monthly.
 - There is no UI to link a goal target to a KPI.
+- Settings → Tags can create a tag but cannot rename or delete one.
