@@ -1,29 +1,72 @@
 ---
 title: Help Center
+description: Short, tested answers to the questions people actually hit in WorkwrK, plus who to ask when the answer is "your admin has to do it".
 ---
 
-<Columns cols={2}>
-  <Card title="FAQs" icon="help-circle" href="/help-center/faq/how-to-invite-team" horizontal>
-    Common questions on using Workwrk.
+Most WorkwrK questions turn out to be one of three things: something is hidden because of your access level, something needs a permission you do not have, or a flow has a required step nobody mentioned. The pages below cover the real behaviour of the product, checked against what the app actually does.
+
+## How to get help
+
+<Steps>
+  <Step title="Check whether it is a visibility rule" icon="eye">
+    A surprising share of "it's broken" is really "you are not entitled to see it". [Why can't I see this?](/help-center/faq/permissions-and-visibility) explains the three doors WorkwrK uses and how Space and List visibility work.
+  </Step>
+  <Step title="Ask your workspace admin" icon="user-cog">
+    Access levels, permissions, reporting lines, Space membership and invites are all set inside your own workspace, and your admins can change any of it without leaving the app. Your organisation admins are the people who hold the `Company Admin` or `Super Admin` access level; if you are not sure who that is, ask your manager. Admins find the controls under `Settings`, in the `Admin` section.
+  </Step>
+  <Step title="Escalate account or billing questions" icon="mail">
+    Anything your admin cannot fix from inside the workspace, such as a billing or account question, goes through the contact page at `https://workwrk.com/contact`.
+  </Step>
+</Steps>
+
+<Callout kind="info">
+  There is no in-app support chat and no ticket queue inside WorkwrK. Your workspace admin is the first line for everything to do with access, membership and permissions.
+</Callout>
+
+## Frequently asked
+
+<Columns cols={3}>
+  <Card title="Inviting your team" icon="user-plus" href="/help-center/faq/how-to-invite-team">
+    The real invite flow, including the KRA and SOP that every invite must carry.
   </Card>
-  <Card title="Troubleshooting" icon="alert-triangle" href="/help-center/troubleshooting/cannot-assign-task" horizontal>
-    Quick solutions for issues.
+  <Card title="Why can't I see this?" icon="eye-off" href="/help-center/faq/permissions-and-visibility">
+    Who sees whose data, and why an app or a Space may be missing from your sidebar.
   </Card>
-  <Card title="Guides" icon="book-open" href="/help-center/guides/create-project" horizontal>
-    Step-by-step tutorials.
-  </Card>
-  <Card title="Changelog" icon="clock" href="/changelog" horizontal>
-    Latest product updates.
+  <Card title="Notifications and reminders" icon="bell" href="/help-center/faq/notifications-and-reminders">
+    What actually triggers a notification, and how reminders fire whether or not the app is open.
   </Card>
 </Columns>
 
-## Contact Support
+## Troubleshooting
 
-<Columns cols={2}>
-  <Card title="Email Support" icon="mail" href="mailto:support@bigboldtech.com">
-    Get help within 24 hours.
+<Columns cols={3}>
+  <Card title="I can't assign a task" icon="user-x" href="/help-center/troubleshooting/cannot-assign-task">
+    The four reasons a person is missing from the assignee picker, or the save is refused.
   </Card>
-  <Card title="Community" icon="users" href="https://community.bigboldtech.com" target="_blank">
-    Share and learn with users.
+  <Card title="The SOP recorder captures nothing" icon="mouse-pointer-click" href="/help-center/troubleshooting/sop-extension-capture">
+    Installing the recorder extension, starting a capture, and what to do when nothing lands.
+  </Card>
+  <Card title="My note or doc is missing" icon="file-question" href="/help-center/troubleshooting/missing-notes-or-docs">
+    The Notepad and Docs are separate stores. Which one you wrote in decides where to look.
   </Card>
 </Columns>
+
+## Step-by-step guides
+
+<Columns cols={3}>
+  <Card title="Set up a project" icon="folder-tree" href="/help-center/guides/create-project">
+    Space, Folder, List, tasks and views, in the order the product expects.
+  </Card>
+  <Card title="Write and run an SOP" icon="scroll-text" href="/help-center/guides/run-an-sop">
+    Pick the right SOP kind, publish it, assign it, and watch acknowledgements land in Compliance.
+  </Card>
+  <Card title="Track a goal" icon="trophy" href="/help-center/guides/track-a-goal">
+    Owner versus contributors, targets with a start value, check-ins, and how progress is calculated.
+  </Card>
+</Columns>
+
+## Related reference
+
+- [Visibility and permissions](/reference/visibility-and-permissions) is the full reference behind the FAQ answer.
+- [Status](/reference/status) records what is built, what is partial, and what does not exist yet, so you can tell a bug from a gap.
+- [Glossary](/reference/glossary) defines Space, List, KRA, KPI, SOP and the rest of the vocabulary used across these pages.

@@ -1,0 +1,96 @@
+---
+title: Write and run an SOP
+description: Choose the right SOP kind, write it, publish it, assign it, and follow the acknowledgements through to Compliance.
+---
+
+An SOP in WorkwrK goes through four states that matter to people: it is written, published, assigned, and acknowledged. Compliance is simply the arithmetic of that last step.
+
+## 1. Pick the right kind
+
+Go to `SOPs` in the left app rail and press `New SOP`. Four kinds are offered, and the choice decides which editor you get.
+
+| Kind | Use it when | What you get |
+| --- | --- | --- |
+| `Written SOP` | A policy, runbook or process that reads as prose | A notes-style block editor, versioned on every save |
+| `Step-by-step SOP` | A recipe someone reads top to bottom | An ordered step list with per-step notes and screenshots |
+| `Checklist SOP` | Discrete steps someone ticks off as they go | A step list that can be run and tracked, with a share link |
+| `Click-capture SOP` | A click path through a piece of software | A screenshot and a written step per click, captured by the recorder extension |
+
+The sidebar `+` on the SOPs app offers the same four directly: `New written SOP`, `New step-by-step SOP`, `New checklist SOP` and `New click-capture SOP`.
+
+Click-capture works differently from the other three: it is recorded by a browser extension rather than typed. See [The SOP recorder isn't capturing](/help-center/troubleshooting/sop-extension-capture).
+
+## 2. Write it
+
+Written and Checklist SOPs open their own editor and auto-save as you work; the header shows `Saving…` and then the time of the last save.
+
+- A **Written SOP** has a title, a description under it ("what is this SOP for, and when should someone reach for it?"), and the block editor for the body.
+- A **Checklist SOP** has a title and a builder of sections and steps. The header counts the steps for you.
+- A **Step-by-step SOP** is created and opens directly in inline editing on the SOP page.
+
+## 3. Publish it
+
+Press `Publish`. On the SOP page it also sits under the `…` menu. Publishing increments the version and makes the SOP available to the team.
+
+There is a light approval path if you want one, in the `…` menu on the SOP page. A `Draft` can be moved to `Submit for review`; something in review can be `Approve` or `Request changes`, which sends it back to draft.
+
+<Callout kind="alert">
+  Publishing is a separate permission from creating. If you cannot publish, your SOP is still saved as a `Draft` for someone who can. Publishing is also validated: a blank title or empty content is refused, and you cannot blank the title or body of an already published SOP. Archive it instead.
+</Callout>
+
+## 4. Assign it
+
+Assignment is only offered once the SOP is published. From the SOP page, open the `…` menu and choose `Assign`.
+
+<Steps>
+  <Step title="Choose who" icon="users">
+    `Assign to Department` assigns everyone in a department at once. `Or Select Individuals` lets you tick people one by one; anyone already assigned is shown greyed out as `Already assigned`.
+  </Step>
+  <Step title="Set a due date" icon="calendar">
+    `Due Date` is optional. It is what makes an assignment count as overdue later.
+  </Step>
+  <Step title="Decide if it is mandatory" icon="badge-alert">
+    `Mandatory` defaults to `Yes`. Mandatory overdue SOPs are called out separately on each person's `My SOPs` page.
+  </Step>
+  <Step title="Assign" icon="check">
+    Press `Assign SOP`. Everyone assigned gets a notification linking to `My SOPs`, and an email if their SOP email preference is on.
+  </Step>
+</Steps>
+
+Removing an assignment later keeps that person's compliance history; it only takes the SOP off their list.
+
+New joiners are a special case: the SOPs chosen in their invitation are assigned as mandatory the moment they accept, so they arrive with reading already waiting. See [How do I invite my team?](/help-center/faq/how-to-invite-team).
+
+## 5. How a person acknowledges it
+
+Assignees have two routes, and both do the same thing.
+
+- On the SOP page, an assignee sees a `Mark as read` button in the header. Once used, it becomes `Acknowledged` with the date.
+- On `SOPs`, then `My SOPs`, every outstanding row carries an `Acknowledge` button.
+
+`My SOPs` groups assignments into `Overdue`, `Active` and `Completed`, with tiles counting overdue, active, completed and the percentage of steps done. Overdue mandatory items get a banner at the top.
+
+Acknowledging is idempotent. Pressing it twice does not double-count.
+
+## 6. Watch Compliance
+
+Open `SOPs`, then `Compliance`. The dashboard reads acknowledgements, so it only becomes meaningful once people start marking things as read. It shows:
+
+- **Org rate**, the share of all assignments completed, plus counts of assignments, in-progress and overdue
+- **By department**, a completion bar per department
+- **Lowest-completion SOPs**, so you can see which procedure is being ignored
+- **Top performers**, by personal completion rate
+- **Overdue**, each late assignment with the person and how many days late
+
+Compliance requires manager access. Below that tier it reports that manager access is required rather than showing an empty dashboard.
+
+<Callout kind="tip">
+  A Compliance page stuck at 0% usually means the SOPs were assigned but nobody has acknowledged them yet. Point people at `My SOPs`; the button is right on the row.
+</Callout>
+
+## Extras worth knowing
+
+- **Checklist runs.** A published Checklist SOP gets a `Start run` button. A run has its own title, an optional assignee and due date, and produces a share link so someone outside the List can complete it. Runs are listed under `Run history` in the SOPs sidebar.
+- **Walk through.** Any SOP with steps can be played one step at a time from the `…` menu. Prose SOPs do not offer it, because there would be no steps to play.
+- **Public link.** A published SOP can expose a `Copy public link`, and the same menu can turn that link off again.
+- **Archive.** Archiving hides an SOP from active lists and is reversible.

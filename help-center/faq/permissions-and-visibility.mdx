@@ -1,0 +1,92 @@
+---
+title: Why can't I see this?
+description: The three doors that decide who sees whose data, how Space and List visibility work, and why an app may be missing from your sidebar.
+---
+
+If something is missing in WorkwrK, it is almost always one of three rules: your access level, your position in the reporting tree, or the visibility set on a Space or List. Work through them in that order.
+
+## The three doors
+
+People data, KRAs, KPIs, goals and reviews all use the same ladder, and it is enforced on the server, not just hidden in the interface.
+
+| Door | Who | What they can reach |
+| --- | --- | --- |
+| 1 | `Employee`, `Agent` | Their own data only. Their career home at `Me` in the Home sidebar carries their KRAs, KPIs and goals. |
+| 2 | `Manager`, `Team Lead` | Themselves plus everyone in their reporting tree, all the way down, not just direct reports. |
+| 3 | `Director`, `VP`, `C-Level`, `HR`, `Company Admin`, `Super Admin` | The whole organisation. |
+
+Two consequences people trip over:
+
+- A manager with **no reports assigned** effectively sees only themselves. Reporting lines are set per person, so if nobody reports to you yet, the team surfaces will look empty. An admin fixes this under `Settings`, then `Reporting hierarchy`, or by setting a person's reporting manager.
+- Door 2 is the *reporting* tree, not the department. Sharing a department with someone does not put them in your tree.
+
+## Why an app is missing from the rail
+
+Some apps in the left rail are gated by access level. They are hidden rather than shown as a locked door, and the pages behind them enforce the same rule if you reach them by URL.
+
+| App | Minimum access |
+| --- | --- |
+| `Teams`, `Automation` | Manager tier: Team Lead, Manager, Director, VP, C-Level, HR, or an org admin |
+| `Review cycles`, `Candor`, `Announce`, `Kudos`, `Surveys`, `Tools`, `Assets`, `Policies`, `Contracts`, `Trash` | HR or an org admin |
+
+Everything else, including `Home`, `Planner`, `Docs`, `Library`, `Goals`, `SOPs`, `Timesheets`, `Forms`, `Clips` and `Dashboard`, is available to everyone.
+
+The rail is also personal: apps can be pinned and unpinned. If an app you are entitled to has vanished, check the `More` tile in the rail before assuming it is a permission problem.
+
+<Callout kind="tip">
+  Employees are never stranded by the Teams gate. Opening a manager-only page sends you to your own profile, which carries your KRAs, KPIs, goals and reviews.
+</Callout>
+
+## Spaces
+
+A Space carries one of three visibility settings, chosen in its `Share` dialog:
+
+| Setting | Who sees it |
+| --- | --- |
+| `Private` | Only invited members |
+| `Workspace` | Members, plus organisation admins |
+| `Org-wide` | Every member of the organisation |
+
+A Space appears in your sidebar if it is `Org-wide`, or if you are a member of it. Organisation admins see every Space. So a `Workspace` Space is still invisible to you until someone adds you as a member.
+
+To be added, ask a Space owner or admin to open the Space's `…` menu, choose `Sharing & Permissions`, and add you. Roles inside a Space are `Owner`, `Admin`, `Member` and `Guest`.
+
+## Lists and boards
+
+A List has its own visibility, which defaults to following its Space:
+
+| Setting | Who sees it |
+| --- | --- |
+| `Inherit Space` | Members of the parent Space. This is the default. |
+| `Private` | Tighter than the Space: board members only |
+| `Org-wide` | Looser than the Space: every member of the organisation |
+
+Two extra rules worth knowing:
+
+- A List inside a **private Folder** is hidden from everyone except the folder's owner, whatever the List's own visibility says.
+- The Space **owner** can see through a `Private` List in their Space. A Space member cannot.
+
+## Goals
+
+Goals follow their own audience rules, which combine with the three doors:
+
+- Company-level goals are visible to everyone in the organisation.
+- Your own goals, and goals whose contributors resolve to you, are visible to you.
+- A manager sees the goals of anyone in their report tree.
+- Door 3 levels see everything.
+
+Opening the URL of a goal you are not entitled to see returns a not-found page, not a redirect, so a missing goal and a forbidden goal look the same from outside. That is deliberate.
+
+## Quick diagnosis
+
+| Symptom | Most likely cause |
+| --- | --- |
+| A colleague's name is missing from a picker | They are not in your report tree, and you are not on Door 3 |
+| A Space others talk about is not in my sidebar | It is `Private` or `Workspace` and you are not a member |
+| A List inside a Space I can see is missing | The List is `Private`, or its Folder is private |
+| A whole app is missing from the rail | It is access-gated, or you unpinned it. Check `More` |
+| A team page redirects me to my profile | You are below manager tier |
+
+Your own access level is shown as a read-only chip on your `Profile`, under `Settings` in the `Personal` section. If it says you should have access and you still do not, ask an organisation admin to check it under `Settings`, then `Members`, and your reporting manager under `Settings`, then `Reporting hierarchy`.
+
+For the full model, see [Visibility and permissions](/reference/visibility-and-permissions).

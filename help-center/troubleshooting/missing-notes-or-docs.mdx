@@ -1,0 +1,51 @@
+---
+title: My note or doc is missing
+description: The Notepad is private to you and Docs is shared with your organisation. Which one you wrote in decides where to look.
+---
+
+WorkwrK has two places to write, and they do not mix. That is by design, and it explains almost every "my note vanished" report.
+
+## The two stores
+
+| | Notepad | Docs and Library |
+| --- | --- | --- |
+| Opened from | The `Notepad` quick tool in the top bar | `Docs` or `Library` in the left app rail |
+| Who can see it | Only you | Whoever the doc is shared with |
+| Appears in Docs, Library or a doc picker | Never | Yes |
+| Best for | Scratch notes, a running personal list | Anything a colleague will read |
+
+A Notepad note is anchored to your own account. It will never show up in the Docs list, in the Library, or in any picker that offers docs, no matter who is looking. Equally, an organisation doc never appears in your Notepad.
+
+<Callout kind="alert">
+  A Notepad note cannot be shared. If you wrote something in the Notepad that a colleague needs, copy the text into a new doc under `Docs`. There is no move or convert action.
+</Callout>
+
+## If you wrote it in the Notepad
+
+1. Open the `Notepad` quick tool in the top bar. If it is not there, open your profile menu and pin it from the personal tools list.
+2. The panel opens on the list of your notes, newest activity first. Each row shows the note's title and a short excerpt.
+3. A note's title is taken from its first non-empty line, so a note that begins with a blank line is listed as "Untitled note". Look for that.
+4. The panel saves as you type and shows `Saving…` while it does. Closing the panel, navigating away or closing the tab all flush the last edit first, and a failed save is retried, so an interrupted note is not normally lost.
+
+If a note opens with "Couldn't load this note", go back and open it again. The editor deliberately refuses to render on a failed load, because typing into a blank editor would save over the real content.
+
+## If you wrote it in Docs
+
+Go to `Docs` in the left app rail. Use the tab strip at the top and the sidebar to narrow:
+
+- Tabs: `All`, `Recent`, `Favorites`, `Created by me`
+- Sidebar: `All Docs`, `My Docs`, `Shared with me`, `Private`, `Meeting Notes`, `Archived`
+
+If it is not in any of those, it may have been deleted. Deleted docs are soft-deleted and stay restorable, so open the docs trash at `/docs/trash` and press `Restore` on the row you want. Nothing there is hard-deleted.
+
+## If you created it from the Library
+
+The Library's `New note` action creates a normal doc and opens it in the docs editor, so a Library note is a doc. Look for it under `Docs`, not in the Notepad. Whiteboards and uploaded files created from the Library stay in the Library under their own tabs.
+
+## Quick decision tree
+
+- Written in a yellow-headed side panel that slid in from the right? That is the **Notepad**. It is private and lives only there.
+- Written in a full page with a Docs sidebar? That is **Docs**. Use the tabs, then `/docs/trash`.
+- Created from the Library's `+` menu? That is a **doc**. Look under `Docs`.
+
+For how the two surfaces are meant to be used, see [Docs and Library](/using/docs-and-library).

@@ -1,0 +1,66 @@
+---
+title: The SOP recorder isn't capturing
+description: Installing the WorkwrK SOP Recorder, starting a click-capture, and fixing the case where clicking produces no steps.
+---
+
+Click-capture SOPs are built by a browser extension called **WorkwrK SOP Recorder**. It takes a screenshot and writes a step for every click you make, so a task you simply *do* becomes a documented procedure. Video is not involved.
+
+## Install the recorder
+
+The extension is not on a web store. While it is unpublished you load it yourself, in desktop Chrome or Edge:
+
+<Steps>
+  <Step title="Open the extensions page" icon="puzzle">
+    Go to `chrome://extensions` in Chrome, or the equivalent extensions page in Edge.
+  </Step>
+  <Step title="Turn on Developer mode" icon="toggle-right">
+    The switch sits in the top right of that page.
+  </Step>
+  <Step title="Load unpacked" icon="folder-open">
+    Press `Load unpacked` and select the extension folder your admin gave you. The extension appears as `WorkwrK SOP Recorder`; its popup footer shows the version.
+  </Step>
+  <Step title="Reload WorkwrK" icon="refresh-cw">
+    Reload the WorkwrK tab so the extension can announce itself to the page.
+  </Step>
+</Steps>
+
+The recorder learns your workspace address automatically the first time you open WorkwrK with it installed. You can also set it by hand from the server settings link in the extension popup; the default is `https://workwrk.com`.
+
+## Record a SOP
+
+<Steps>
+  <Step title="Open the record page" icon="mouse-pointer-click">
+    In WorkwrK go to `SOPs`, then `New SOP`, then `New click-capture SOP`. When the extension is present, the panel shows `Extension detected`.
+  </Step>
+  <Step title="Name it and start" icon="play">
+    Type a title, for example "Approve a leave request", then press `Start recording`. If the extension answers, the button changes to `Recording…` and the page confirms that every click is being captured.
+  </Step>
+  <Step title="Click through the process" icon="pointer">
+    Just do the task normally, on any site. Each click produces one screenshot with the click point marked and one plain-English step, such as "Click the Submit button". A small `WorkwrK Recording` badge sits on every page while capture is on, and a subtle dot marks each captured click. No narration is needed.
+  </Step>
+  <Step title="Stop and save" icon="square">
+    Open the extension popup and press `Stop & Save`. The popup shows how many steps were captured, uploads them, and confirms with `SOP saved successfully!`. Recording stops in every tab at once.
+  </Step>
+</Steps>
+
+<Callout kind="info">
+  If you do not have permission to publish SOPs, the recording is still saved. The popup says "Saved as a draft, someone with publish rights can make it live" and the SOP lands in `SOPs` as a `Draft`. Nothing is lost, it simply is not live yet.
+</Callout>
+
+## Nothing is being captured
+
+**"Extension not detected" after pressing Start.** The page waited for the extension to answer and heard nothing. Confirm the extension is installed and enabled, reload the WorkwrK tab, then press `Start recording` again. If it is installed, check that its server address matches the address you are using, via the server settings link in the popup.
+
+**Clicks happen but the step count stays at 0.** Open the popup while recording; it shows the live count. Clicks on the recorder's own badge are deliberately ignored. If the count is genuinely stuck, stop, reload the page and start a new recording.
+
+**The save fails.** The popup shows the reason and a `Try Again` button. Your steps are still stored in the extension, so retrying does not lose them. The two common causes are being signed out at that address, and the address setting pointing somewhere other than the workspace you are signed in to. Fix, then press `Try Again` and `Stop & Save` once more.
+
+**"No steps recorded".** A recording with zero captured clicks is rejected rather than saved as an empty SOP. Start again and click through the process.
+
+**Retrying created no duplicates.** That is intended. Each recording session carries an identity, so if the first save actually succeeded but its response was lost, the retry returns the SOP that already exists instead of creating a second one.
+
+## After the recording
+
+The SOP opens like any other. You can edit steps, publish it, and assign it. See [Write and run an SOP](/help-center/guides/run-an-sop) for the rest of the loop.
+
+Click-capture is one of four SOP kinds. If you are documenting a policy rather than a click path, a Written or Checklist SOP will be less work.

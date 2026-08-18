@@ -1,25 +1,91 @@
 ---
-title: Creating a New Project
-description: Quick guide to set up a project in Workwrk.
+title: Set up a project
+description: Space, Folder, List, tasks and views, in the order WorkwrK expects, using the real create menus.
 ---
 
-## Overview
+WorkwrK organises work in a fixed hierarchy. Getting it right at the start saves rework later:
 
-Projects group your people, tasks, and goals for easy management.
+**Space** contains **Folders** and **Lists**. A **Folder** groups Lists. A **List** holds the **tasks**. Each List can be looked at through several **views**.
 
-## Quick Start
+A project is usually one List. A department or a workstream is usually a Space.
+
+## 1. Create the Space
 
 <Steps>
-  <Step title="Start a new project">
-    From the dashboard, click `New Project`.
+  <Step title="Open the new-Space dialog" icon="layout-grid">
+    In the Home sidebar, find the `Spaces` section. Use the `+` next to the heading, or the `New Space` row at the bottom of the list.
   </Step>
-  <Step title="Enter details">
-    Name your project and set a description.
+  <Step title="Name it and pick an icon" icon="pencil">
+    The first step asks for `Icon & name` and an optional description.
   </Step>
-  <Step title="Add members">
-    Pick team members to join and set permissions.
-  </Step>
-  <Step title="Save">
-    Click `Create`. Your project is ready for tasks!
+  <Step title="Decide who can see it" icon="lock">
+    The privacy switch makes the Space `Private`, meaning invited members only. Left off, it is a `Workspace` Space: its members plus organisation admins. You can change this later, and add `Org-wide`, from the Space's `Share` dialog.
   </Step>
 </Steps>
+
+<Callout kind="alert">
+  A `Workspace` Space is not automatically visible to everyone. People still have to be members. Only an `Org-wide` Space shows up for the whole organisation without an invitation.
+</Callout>
+
+## 2. Add Folders, if you need them
+
+Folders are optional. Use one when a Space will hold more than a handful of Lists.
+
+Hover the Space row in the sidebar, click its `+`, and choose `Folder`. The same `+` menu also offers `List`, `Sprint`, `Doc`, `Dashboard`, `Whiteboard`, `Database` and `Form`, so it is the fastest way into anything inside that Space.
+
+A Space's `…` menu has the same creates under `Create new`, along with `Rename`, `Copy link`, `Color & Icon`, `Sharing & Permissions`, `Duplicate`, `Archive` and `Delete`.
+
+## 3. Create the List
+
+The List is where tasks live.
+
+<Steps>
+  <Step title="Open Create List" icon="list-checks">
+    From the Space's `+` menu choose `List`, or use the global `+` and choose `List`. Opening it from a Folder page drops the new List into that Folder.
+  </Step>
+  <Step title="Fill in the form" icon="form-input">
+    `Name` is required. `Description` is optional. `Space (location)` sets where it lives. The privacy switch makes the List `Private` instead of inheriting the Space.
+  </Step>
+  <Step title="Create" icon="check">
+    You land on the new List straight away.
+  </Step>
+</Steps>
+
+If you would rather choose the starting view up front, use the new-board dialog instead, from the Space's `…` menu or the sidebar. It shows a tile per view type, so you can start a List as a `Board (Kanban)`, `Calendar`, `Gantt (Chart)`, `Table`, `Doc (Wiki)`, `Form (Survey)`, `Dashboard (Report)`, `Whiteboard`, `Workload (Capacity)`, `Map` or `Timeline`. Tiles that are not built yet say so rather than creating something empty.
+
+## 4. Add tasks
+
+On the List, use `Add task`. Anywhere in the app, `Cmd`/`Ctrl` + `Shift` + `K` opens the quick-task modal, where you pick the List, then set the task type, status, assignee and dates before saving.
+
+A task carries a name, a status, an assignee, start and due dates, a priority, tags, subtasks, a checklist and time estimates. The scheduling popover on a task has three tabs: `Date` for start and due, `Reminder` to arm alerts, and `Repeat` to make the task recur.
+
+<Callout kind="tip">
+  If the person you want is missing from the assignee picker, that is a scope rule rather than a bug. See [I can't assign a task to someone](/help-center/troubleshooting/cannot-assign-task).
+</Callout>
+
+## 5. Add the views your team needs
+
+A List is one set of tasks seen through several lenses. The view tabs sit across the top of the List; the `+ View` control at the end of the strip adds another.
+
+The common ones are `List`, `Board (Kanban)`, `Calendar`, `Gantt (Chart)`, `Doc (Wiki)`, `Form (Survey)` and `Dashboard (Report)`. More are available under the fuller catalogue, including `Table`, `Whiteboard`, `Activity (Feed)`, `Workload (Capacity)`, `Map`, `Chart (Report)`, `Timeline`, `Cards (Gallery)`, `Pivot`, `Hierarchy` and `File gallery`.
+
+Views can be dragged into the order you want, and each tab has a right-click menu.
+
+For what each view is good at, see [Views](/using/views).
+
+## 6. Share it
+
+Open the Space's `Share` dialog to set visibility and add people. Space roles are `Owner`, `Admin`, `Member` and `Guest`. A List has its own `Share` dialog, where visibility is `Inherit Space` by default, and can be tightened to `Private` or loosened to `Org-wide`.
+
+Remember that editing tasks needs more than read access: it takes being an `Owner` or `Admin` of the Space, the List's owner, or an organisation admin.
+
+## A worked shape
+
+A marketing team might end up with:
+
+- Space: **Marketing**, `Workspace`, members are the marketing team
+- Folder: **Campaigns**
+- Lists: **Q3 launch**, **Website refresh**, **Always-on content**
+- The **Q3 launch** List with three views: `List` for daily work, `Board` for the weekly stand-up, `Calendar` for the publishing schedule
+
+Next, tie the work to outcomes with [Track a goal](/help-center/guides/track-a-goal), or document how the work is done with [Write and run an SOP](/help-center/guides/run-an-sop).
