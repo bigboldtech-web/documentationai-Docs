@@ -41,21 +41,34 @@ Every gated page calls a server side gate before it renders, and the matching AP
 - `requireHrAdminPage()` sends managers to `/team/reviews` and everyone else to `/people/me`.
 - `requireGoalPage(id)` runs `canSeeGoal` and calls `notFound()` when you fail, so a guessed goal URL reads as "does not exist" rather than "exists but you cannot see it".
 
+## Audience is not permission
+
+A second, separate mechanism decides who a thing is **aimed at**. Goals, announcements and pulse surveys all carry an audience, and an audience can be everyone, a set of people, a set of departments, a set of offices, a set of roles, or a set of **person-tags**, depending on the module.
+
+Two rules hold across all of them:
+
+- **Membership resolves at read time.** A department, role or tag audience is stored as the department, role or tag, never as a frozen list of names. Someone who joins the department or picks up the tag is inside the audience on the very next read; a leaver drops out. Only ACTIVE, non-deleted users resolve, and archived tags never resolve.
+- **Audience narrows what you are shown, it does not widen what you may open.** An announcement targeted at your tag appears in your feed and notifies you. An announcement targeted at someone else's tag does not. Neither changes what your Level lets you reach anywhere else in the product.
+
+Announcements are the clearest case: the composer's **Who sees this** control is real targeting, and both the feed filter and the notification fan-out use the same resolver (`src/lib/announcement-audience.ts`). A legacy or malformed stored audience normalises to "everyone" rather than throwing, so old rows stay visible.
+
 ## What each door sees, per module
 
 ### Your own profile and career home
 
 `/people/me` redirects to `/people/<your id>`. That page renders in one of three modes decided on the server:
 
-- **self**: your job title and description, your inherited KRAs with your own KPI readings, the recorder that puts numbers into the approval loop, your goals, your reviews, your assets.
-- **manage**: what a manager or an org wide viewer sees when inspecting a report. The same narrative plus edit actions.
-- **peer**: a minimal directory card. Name, title, department, manager. Never KPI readings, reviews, moods or scores.
+- **self**: your job title and description, your inherited KRAs with your own KPI readings, the recorder that puts numbers into the approval loop, your goals, your reviews, your assets, and your person-tags read-only.
+- **manage**: what a manager or an org wide viewer sees when inspecting a report. The same narrative plus edit actions, including editing that person's tags.
+- **peer**: a minimal directory card. Name, title, department, manager. Never KPI readings, reviews, moods, scores or tags.
 
 Anyone in the org gets at least peer mode on anyone else, because @mentions and tagging need names and avatars.
 
 ### People directory
 
 `/api/users` supports `scope=team` and `scope=all`. A caller below the org wide door is forced to `team` no matter what they pass, and `team` means their recursive report tree. If they have no reports, they see only themselves.
+
+The directory also accepts `?tagIds=`, which narrows to people carrying any of those person-tags. It is ANDed with the scope, so a tag filter can only ever shrink what you were already allowed to see: it never reaches a person outside your door.
 
 ### KRAs and KPIs
 
@@ -68,12 +81,12 @@ For a specific person's alignment data, `canTouchUserAlignment` is the single pr
 The goals list at `/okrs` is open to every signed in member. The **rows** are what get filtered, in `/api/okrs`:
 
 - Everyone sees goals at COMPANY level.
-- Everyone sees their own goals, whether they own them or are a resolved member of the audience.
+- Everyone sees their own goals, whether they own them or are a resolved member of the audience. That includes goals targeted at a department, a role or a tag they carry.
 - Everyone sees DEPARTMENT level goals for their own department.
-- Managers additionally see goals owned by anyone in their report tree, goals whose audience covers anyone in that tree, and unowned objectives.
+- Managers additionally see goals owned by anyone in their report tree, goals whose audience covers anyone in that tree (including by tag), and unowned objectives.
 - Org wide levels see everything.
 
-Audience membership is resolved at read time, never from a frozen list. A goal assigned to a department or a role is re-resolved on every read, so a new hire inherits it and a leaver drops out automatically. Only ACTIVE, non-deleted users ever resolve.
+Audience membership is resolved at read time, never from a frozen list.
 
 Editing and deleting use separate predicates. `canEditOkrOwner` allows the owner, org wide levels, and a manager over the owner. `canDeleteGoal` narrows the org wide door to org admins only. The interface gates its Delete button on the same predicate the API enforces, so you never see a Delete that then returns 403.
 
@@ -93,6 +106,12 @@ This is membership based, not Level based, and it composes downward.
 
 Org admins override all three.
 
+### Docs, and the Notepad exception
+
+Documents follow their own share model (owner, explicit per-person edit or view grants, and an optional public link).
+
+Notepad notes are the one carve-out. A notepad note is a Doc anchored to `NOTEPAD` plus its owner's user id, and `src/lib/doc-access.ts` treats that anchor as owner-only: no share, no manager override. The plain `/api/docs` list also filters those rows out, which is why they never surface in `/docs`, in the Library, or in a document picker, even for an admin browsing normally.
+
 ### SOPs
 
 SOP visibility runs through `src/lib/sop-access.ts` and is folder based, with inheritance.
@@ -102,6 +121,8 @@ SOP visibility runs through `src/lib/sop-access.ts` and is folder based, with in
 - Within a folder, a viewer sees only PUBLISHED SOPs. Editors, owners and the author also see drafts.
 
 Granting folder access is an org admin action.
+
+One deliberate exception on the SOP detail page: the **Mark as read** acknowledgement control renders for anyone who holds an assignment on that SOP, including people with no SOP management rights at all. Being assigned a procedure has to be enough to close it out.
 
 ### Timesheets
 
@@ -131,11 +152,19 @@ Goals, the people directory, KRAs and the alignment scope helpers use the first.
 
 ## The permission matrix is mostly aspirational
 
-`/settings/permissions` presents a matrix of 16 modules with per action toggles per Level, stored on `Organization.settings.permissions`.
+`/settings/permissions` presents a matrix of 16 modules with per action toggles per Level, stored on `Organization.settings.permissions`. The 16 are people, organization, kras, sops, reviews, okrs, tasks, meetings, policies, announcements, assets, surveys, ideas, analytics, tools and settings. There is no row for tags, docs or candor, so those are governed entirely by the ladders above.
 
-Only 10 of 439 API route files actually call `requirePermission`, and between them they cover five modules: `kras` (the KRA, KRA assignment, KPI and orphan routes all check this one key), `sops`, `assets`, `policies` and `announcements`. Everything else is governed by the hardcoded Level ladders described above.
+Only 11 of 439 API route files actually call `requirePermission`, and between them they cover five modules:
 
-Two more files import or mention the helper without ever calling it, so do not count them: `src/app/api/candor/route.ts` imports `requirePermission` and never invokes it, and `src/app/api/tag-assignments/route.ts` only names it in a comment. The `candor` and `tags` rows in the matrix are therefore decorative like the rest.
+| Module | Route files that check it |
+| --- | --- |
+| `kras` | `/api/kras`, `/api/kras/orphans`, `/api/kra-assignments`, `/api/kpis` |
+| `sops` | `/api/sops`, `/api/sops/record`, `/api/sops/[id]` |
+| `assets` | `/api/assets`, `/api/assets/[id]` |
+| `policies` | `/api/policies` |
+| `announcements` | `/api/announcements` |
+
+Everything else is governed by the hardcoded Level ladders described above. One file names the helper without ever calling it, so do not count it: `src/app/api/tag-assignments/route.ts` mentions `requirePermission` only in a comment, which is why attaching a tag to a person is gated by the profile's manage mode rather than by the matrix.
 
 Treat the matrix as authoritative for those five modules and decorative everywhere else. Trimming it to what is enforced is on the plan.
 
@@ -149,7 +178,10 @@ Treat the matrix as authoritative for those five modules and decorative everywhe
 | Server side page gates | `src/lib/page-gates.ts` |
 | Central resource resolver (space, board, item, user, KRA, weekly review, module) | `src/lib/access.ts` |
 | Goal visibility, audience resolution | `src/lib/goal-audience.ts` |
+| Announcement audience resolution | `src/lib/announcement-audience.ts` |
+| Person tags, and resolving a tag to its holders | `src/lib/user-tags.ts` |
 | Report trees | `src/lib/team.ts`, `src/lib/reporting-line.ts` |
+| Doc and Notepad access | `src/lib/doc-access.ts` |
 | SOP folder visibility | `src/lib/sop-access.ts` |
 | Level list shown in pickers | `src/lib/access-levels.ts` |
 | Permission matrix | `src/lib/permissions.ts` |

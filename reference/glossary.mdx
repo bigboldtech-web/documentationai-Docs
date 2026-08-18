@@ -12,12 +12,12 @@ A department. "Function" and "Department" are the same thing, and the database c
 
 A Function is a container for people. It is not a permission boundary on its own: what you can see is decided by your Level and your reporting line, not by which Function you sit in. The one exception is goals, where a DEPARTMENT level goal is visible to everyone in that department.
 
-Today the Departments page can only create. Rename, head assignment, re-parent and delete are not reachable from the interface.
+The Departments page does full CRUD: create, rename, edit description and colour, assign a head, re-parent into a nested tree, and delete. The server refuses to delete a department that still has members. Merge and archive are the two operations still missing.
 
 ### Level
 Your position on a fixed access ladder, stored on your user record. The full ladder, top down: Super Admin, Company Admin, C-Level, VP, Director, Manager, Team Lead, HR, Employee, Agent.
 
-Levels are an enum in the code. You cannot invent a new one, and you cannot edit what a Level can do beyond the permission matrix (which only 10 API route files actually consult, covering five modules). Super Admin and Company Admin are absent from the **Role** level picker so nobody can promote themselves through a job title, but Company Admin is offered in the invite modal and both are offered on Settings → Members.
+Levels are an enum in the code. You cannot invent a new one, and you cannot edit what a Level can do beyond the permission matrix (which only 11 API route files actually consult, covering five modules). Super Admin and Company Admin are absent from the **Role** level picker so nobody can promote themselves through a job title, but Company Admin is offered in the invite modal and both are offered on Settings → Members.
 
 Level drives the three-door visibility model. See [Visibility and permissions](/reference/visibility-and-permissions).
 
@@ -27,6 +27,20 @@ Your job title. "Head of Customer Success", "Backend Engineer". Roles live at **
 A Role is where KRAs are defined. When somebody is hired into a Role, or moved to one, they inherit that Role's KRAs and the published SOPs attached to those KRAs.
 
 **Role is not Level.** Two people can both be "Backend Engineer" (Role) while one is a Team Lead and the other an Employee (Level). Roles decide what you are accountable for. Levels decide what you can see.
+
+### Tag
+A label from one shared org-wide taxonomy, minted at **Settings → Tags**. The same tag can be stuck on a board task, a SOP, or a **person**.
+
+Person tags are the segmentation primitive. You attach them from the tag control under someone's name on their profile (a manager edits them; you can read your own). Once a person carries a tag, four things can use it:
+
+- The **Directory** shows a Tags filter row and narrows to people carrying any selected tag.
+- A **Goal** can name a tag as a contributor.
+- A **pulse survey** can target a tag as its audience.
+- An **Announcement** can target a tag as its audience.
+
+In all four cases the membership is resolved at read time from the live tag assignments, never frozen. Tag someone tomorrow and they are inside the audience on the next read. Archived tags never resolve.
+
+Person tags are not a permission. They decide who a thing is aimed at, not what anyone is allowed to open.
 
 ### Manager and report tree
 Your manager is a direct field on your user record. Your **report tree** is you plus everyone below you, walked recursively.
@@ -40,7 +54,7 @@ Key Result Area. A permanent area of accountability attached to a **Role**, not 
 
 A KRA has no number and no deadline. It is a container. It carries a **weight** from 0 to 100 expressing what share of the job it represents.
 
-When you hold a Role, you get a `KRAAssignment` for each of its KRAs, and the assignment carries your own weight, seeded from the Role's default and editable per person. Each individual weight is bounded 1 to 100, but the total is not a hard cap: a total over 100 saves and returns an advisory warning rather than being rejected, so someone already over budget can still rebalance. Nothing requires the total to reach 100 either.
+When you hold a Role, you get a `KRAAssignment` for each of its KRAs, and the assignment carries your own weight, seeded from the Role's default and editable per person. Each individual weight is bounded 1 to 100 on the assignment, but the total is not a hard cap: a total over 100 saves and returns an advisory warning rather than being rejected, so someone already over budget can still rebalance. The role-level weights behave the same way, warning past 100 rather than refusing. Nothing requires either total to reach 100.
 
 Important, and easy to get wrong: **KRA weight is displayed but is not used in any scoring math today.** A 5% KRA and a 50% KRA count identically in every score the product computes.
 
@@ -73,22 +87,22 @@ A person with no records shows a dash, not 100%. This is deliberate: the least m
 ### Goal / OKR
 A time boxed objective. The product uses "Goal" in the interface and `OKR` in the code and API paths. They are the same object.
 
-A goal belongs to a **quarter** (or to no quarter) and sits at a level: Company, Department, Team or Individual.
+A goal belongs to a **quarter** (or to no quarter) and sits at one of three levels: Company, Department or Individual. There is no Team level.
 
 ### Owner
 The single accountable person on a goal. One goal, one owner. Not a committee.
 
 ### Contributor
-Anyone else attached to the goal. A contributor entry points at exactly one subject: a person, a department, or a role.
+Anyone else attached to the goal. A contributor entry points at exactly one subject: a person, a department, a role, or a **tag**.
 
-Department and role contributors are stored as the department or the role, never as a frozen list of names. Membership is resolved every time the goal is read, so a new hire inherits their team's goals automatically and a leaver drops out automatically. Only active, non-deleted people ever resolve.
+Department, role and tag contributors are stored as the department, the role or the tag, never as a frozen list of names. Membership is resolved every time the goal is read, so a new hire inherits their team's goals automatically, someone who picks up a tag joins that goal's audience, and a leaver drops out automatically. Only active, non-deleted people ever resolve.
 
 A goal shared across five people is still **one record with one scoreboard**. Seeing it on five profiles is seeing the same row five times, not five copies.
 
 ### Key result / Target
-A measurable outcome under a goal, with a start value, a target value and a current value.
+A measurable outcome under a goal, with a start value, a target value and a current value. Progress runs from the start value toward the target value, so a target that improves by going down rises as the number falls.
 
-A key result can be **linked to a KPI**. When it is, its current value and progress are read from that KPI's latest usable reading at the moment you look, scoped to the goal owner's own records. Nothing is written back onto the key result row, and the number you typed by hand is kept (returned as `enteredValue`) rather than overwritten.
+A key result can be **linked to a KPI**. When it is, its current value and progress are read from that KPI's latest usable reading at the moment you look, scoped to the goal owner's own records. Nothing is written back onto the key result row, and the number you typed by hand is kept (returned as `enteredValue`) rather than overwritten. There is no control in the interface that creates the link; today it can only be set through the API.
 
 ### Progress
 One derived number per goal, shown identically everywhere.
@@ -100,14 +114,23 @@ One derived number per goal, shown identically everywhere.
 Status thresholds: 100 or above is Completed, 70 or above is On track, 40 or above is At risk, below that is Behind.
 
 ### Check-in
-A dated update on a key result with a value and a note. Checking in recomputes the goal's progress and pushes it up the parent chain.
+A dated update on a key result with a value and a note. The dialog asks for a change (Increase or Decrease plus an amount) and does the arithmetic against the current value; the API is sent the resulting absolute value. Checking in recomputes the goal's progress and pushes it up the parent chain.
 
 ## Knowledge
 
 ### SOP
-Standard Operating Procedure. A written or step-by-step procedure, versioned, and assignable to people.
+Standard Operating Procedure. A documented procedure, versioned, and assignable to people.
 
-SOPs can be attached to a KRA. That is what makes them flow automatically: when someone is hired into a Role, every published SOP under that Role's KRAs is assigned to them.
+There are four kinds, picked once when you create it:
+
+- **Written SOP**: long-form prose in the block editor, with its own description field. No steps.
+- **Step-by-step SOP**: an ordered list of steps with per-step notes and screenshots.
+- **Checklist SOP**: discrete steps someone ticks off, runnable as a process run.
+- **Click-capture SOP**: the recorder extension writes a screenshot and a step for each click.
+
+Under the hood, Step-by-step is a Written SOP whose body is a step list, which is why the detail page's Type field reads Written, Step-by-step, Checklist or Recording.
+
+SOPs can be attached to a KRA, from the **Linked KRA** picker on the SOP's own page. That is what makes them flow automatically: when someone is hired into a Role, every published SOP under that Role's KRAs is assigned to them. A SOP can also be linked from a board task, and the SOP page lists those under **Used by tasks**.
 
 Statuses are Draft, In review, Approved, Published and Archived. Only Published SOPs are visible to ordinary viewers in a folder, and only Published SOPs auto-assign.
 
@@ -116,11 +139,16 @@ Visibility is folder based and inherits downward: access to "HR" also grants "HR
 ### SOP assignment
 One person's copy of the obligation to read or run an SOP, with progress in steps completed out of steps total. This is what drives the SOP read rate on the team alignment board and the SOP component of the performance score.
 
+An assignee closes it with the **Mark as read** button in the SOP header, which acknowledges the SOP, completes the assignment and stamps the date. The button appears for anyone holding an assignment, including people who cannot otherwise manage SOPs.
+
 ### Process run
 One execution of a step-by-step SOP, with a history at `/process-runs` and a public share link at `/run/<token>` for people outside the workspace.
 
 ### Policy
 Distinct from an SOP. A policy is a document people acknowledge rather than execute, with an acknowledgement ledger. Lives at `/policies`.
+
+### Notepad
+Your private sticky notes, opened from the topbar Notepad tool. A notepad note is stored as a Doc anchored to you, and it is owner-only: notepad notes never appear in `/docs`, in the Library, or in any document picker, and nobody else can open them. Notepad is not Docs, and it is not a place to write something a colleague needs to read.
 
 ## Work chassis
 
@@ -140,7 +168,7 @@ One row on a List. The interface calls it a Task. The code and database call it 
 
 An Item carries an owner, status, priority, dates, tags, custom fields, subtasks, a checklist, comments and tracked time.
 
-**Know this:** a separate legacy `Task` table also exists, written only by the older `/api/tasks` endpoint. `/analytics`, the performance score's task component and `/api/tasks/workload` still read that legacy table, so they cannot see the tasks you create on Lists. Global search used to read it too, but no longer: `/api/search` now indexes the real `Item` graph, so searching finds your board tasks.
+**Know this:** a separate legacy `Task` table also exists, written only by the older `/api/tasks` endpoint. `/analytics`, the performance score's task component, `/api/tasks/workload` and the scheduled "tasks due today" digest still read that legacy table, so they cannot see the tasks you create on Lists. Global search used to read it too, but no longer: `/api/search` now indexes the real `Item` graph, so searching finds your board tasks.
 
 ### View
 One way of rendering a List. Seventeen renderers exist: List/Table, Board/Kanban, Calendar, Gantt, Timeline, Workload, Cards, Hierarchy, Pivot, Chart, Dashboard, Form, Doc, Whiteboard, File gallery, Map and Activity.
