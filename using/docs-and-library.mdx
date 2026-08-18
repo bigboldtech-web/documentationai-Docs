@@ -1,9 +1,9 @@
 ---
 title: Docs and Library
-description: Writing in the block editor, sub-pages, version history and sharing; plus the Library's notes, whiteboards, files and tables.
+description: Writing in the block editor, sub-pages, version history and sharing; the Library's notes, whiteboards, files and tables; and the private Notepad.
 ---
 
-Two related surfaces. **Docs** is the writing app. **Library** is the shelf where notes, whiteboards, files and tables all sit together, filterable by Space.
+Three related surfaces. **Docs** is the writing app. **Library** is the shelf where notes, whiteboards, files and tables all sit together, filterable by Space. **Notepad** is your own private scratch pad, and it deliberately appears in neither of the other two.
 
 ---
 
@@ -76,11 +76,27 @@ Inviting someone by email from this panel is **not built**. The row is there and
 
 ---
 
+## Notepad
+
+**Notepad** is the sticky-note panel behind the notepad icon in the topbar tools. The palette's **New notepad** quick action opens the same panel, and the voice capture tool writes into it.
+
+It is a list of short notes plus the same block editor Docs uses, with debounced autosave. What matters about it is where the notes live and who can reach them:
+
+- A notepad note is stored as a document anchored to **you**. It is owner-only, and that gate has no read-around: a manager or an org admin cannot open one.
+- Notepad notes do not appear in `/docs`, in the **Library**, or in the "Link existing" note picker on a task, because the document list filters them out by anchor.
+- Search is the one place your own notes can surface, and only your own. Results are access-checked row by row against the same owner-only gate, so a colleague searching the same words never sees them.
+
+So Notepad is not "Docs, but quicker". It is the private half. Write a thought there and it stays with you; write something a colleague needs and it belongs in Docs, or in the Library, or on the task itself.
+
+There is no way to promote a notepad note into a shared Doc today. Copy the text across if you need it published.
+
+---
+
 ## Library
 
 `/library` has four tabs: **Notes**, **Whiteboards**, **Files**, **Tables**. Each tab has a search box and a row of Space chips (All, Unscoped, then one per Space) so you can narrow to what belongs to a given Space.
 
-Notes created from a Space chip are tagged to that Space.
+Notes created from a Space chip are tagged to that Space. Notepad notes are not here, by design.
 
 ### Whiteboards
 
@@ -108,6 +124,6 @@ A table is a spreadsheet-shaped data grid, separate from Lists. It is for refere
 - **Saved views** are named and persist on the table: grid, kanban, calendar and gallery. A table always keeps at least one view.
 - **Import** takes a CSV and creates rows, adding columns it does not recognise. **Export** downloads the current table as CSV.
 
-There is a **Public** toggle in the header, and it does exactly what it says. Turning it on marks the table readable through an unauthenticated endpoint (`/api/public/tables/<id>`) and publishes a read-only web page at `/embed/tables/<id>` that anyone with the link can open without signing in. A second button then appears that copies an `<iframe>` snippet pointing at that page.
+There is a **Public** toggle in the header, and it does exactly what it says. Turning it on marks the table readable through an unauthenticated endpoint (`/api/public/tables/<id>`) and publishes a read-only web page at `/embed/tables/<id>` that anyone with the link can open without signing in. A second button then appears that copies an iframe snippet pointing at that page.
 
 Treat it as a real publish action, not a flag. Every row and column becomes visible to anyone who has or guesses the link. Turning the toggle back off makes the endpoint 404 again.

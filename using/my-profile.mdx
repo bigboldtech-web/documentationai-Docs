@@ -1,6 +1,6 @@
 ---
 title: Your profile (Me)
-description: "The Me page: your job title, your KRAs and KPI readings, recording your numbers, your goals, and your review record."
+description: "The Me page: your job title, your tags, your KRAs and KPI readings, recording your numbers, your goals, and your review record."
 ---
 
 **Me** is the first row in the Home sidebar. It goes to `/people/me`, which resolves to your own person page at `/people/<your id>`.
@@ -14,10 +14,20 @@ This is your career home. It answers three questions in one place: what am I acc
 The same route renders in one of three modes, decided on the server before anything is drawn:
 
 - **Self**: your own page. Your job title and description, your KRAs with **your** KPI readings, the recorder for your own numbers, your goals, your reviews, your assets.
-- **Manage**: a manager or an org-wide viewer looking at a report. The same narrative about that person, plus Edit profile, Manage alignment, and recording numbers on their behalf.
+- **Manage**: a manager or an org-wide viewer looking at a report. The same narrative about that person, plus Edit profile, Manage alignment, editing that person's tags, and recording numbers on their behalf.
 - **Peer**: a colleague you do not manage. A minimal directory card: name, title, department, manager. No KPI readings, no reviews, no mood check-ins, no scores.
 
 The mode is not a UI toggle. The APIs behind the page enforce the same ladder again, so a peer cannot pull a report's numbers by calling them directly.
+
+---
+
+## The header, and your tags
+
+The header carries your avatar, name, job title (a link to that role's definition page), email, phone, department and who you report to.
+
+Under that sits your **tags**. A tag is a free label from the org-wide list, used for the cuts the org chart does not make: a launch team, a shift, a cohort, a cost centre. Tags matter because they are a targeting primitive: a goal can list a tag as a contributor, and a pulse survey or an announcement can be aimed at one. Membership is resolved every time those are read, so picking up a tag today puts you in everything already aimed at it.
+
+On your own page your tags are **read-only**. The picker is editable in manage mode, which means a manager in your line or an org-wide viewer sets them. If a tag on you is wrong, ask them.
 
 ---
 
@@ -59,6 +69,8 @@ A manager recording numbers on a report's behalf writes through the manager path
 
 The **My goals** section lists the goals you carry this quarter with their status chip and progress bar. Each row links to the goal detail page.
 
+You carry a goal either because you own it or because you resolve into its audience: as yourself, through your department, through your role, or through one of your tags.
+
 The number here is the same derived rollup the Goals page shows: it reads **"—"** when nothing about the goal is measured yet, not `0%`. If you have no goals, the section offers a link to set one.
 
 **All goals** in the section header goes to `/okrs?mine=1`, filtered to goals you own or contribute to.
@@ -78,6 +90,14 @@ The number here is the same derived rollup the Goals page shows: it reads **"—
 | **Direct Reports** | Only appears if you have reports. Cards linking to each person's page. |
 
 Managers looking at a report see extra blocks above the tabs: a composite score with its breakdown, a performance trend chart when there is history, and four stat tiles (average KPI, active KRAs, average mood, latest review score). Where there is no data, these read "N/A" rather than a fabricated figure.
+
+---
+
+## Your assigned SOPs
+
+Procedures assigned to you live at `/sops/my-sops`, grouped into overdue, active and done.
+
+Closing one out is yours to do, not your manager's: **Acknowledge** on the row, or **Mark as read** in the header of the SOP itself, completes the assignment, stamps the date and counts every step as done. The SOP header then reads **Acknowledged** with that date. Neither control needs any management permission, so an ordinary employee always has a way to finish what they were assigned.
 
 ---
 
