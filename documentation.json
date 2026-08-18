@@ -1,205 +1,78 @@
 {
   "name": "Workwrk",
-  "colors": {
-    "light": {
-      "brand": "#0073EA"
-    },
-    "dark": {
-      "brand": "#4DA3F5"
-    }
-  },
+  "colors": { "light": { "brand": "#0073EA" }, "dark": { "brand": "#4DA3F5" } },
   "navigation": {
     "tabs": [
       {
         "tab": "Documentation",
         "icon": "book",
         "groups": [
-          {
-            "group": "Getting Started",
-            "icon": "rocket",
-            "pages": [
-              {
-                "title": "Introduction",
-                "path": "introduction",
-                "icon": "home"
-              },
-              {
-                "title": "Core concepts",
-                "path": "getting-started/core-concepts",
-                "icon": "compass"
-              },
-              {
-                "title": "First week setup",
-                "path": "getting-started/first-week-setup",
-                "icon": "list-checks"
-              }
-            ]
-          },
-          {
-            "group": "Using WorkwrK",
-            "icon": "layers",
-            "pages": [
-              {
-                "title": "Spaces and tasks",
-                "path": "using/spaces-and-tasks",
-                "icon": "square-check"
-              },
-              {
-                "title": "Views",
-                "path": "using/views",
-                "icon": "table"
-              },
-              {
-                "title": "Docs and library",
-                "path": "using/docs-and-library",
-                "icon": "file-text"
-              },
-              {
-                "title": "Goals",
-                "path": "using/goals",
-                "icon": "target"
-              },
-              {
-                "title": "My profile",
-                "path": "using/my-profile",
-                "icon": "user"
-              },
-              {
-                "title": "Time and search",
-                "path": "using/time-and-search",
-                "icon": "timer"
-              }
-            ]
-          },
-          {
-            "group": "Administration",
-            "icon": "settings",
-            "pages": [
-              {
-                "title": "Functions and levels",
-                "path": "admin/functions-and-levels",
-                "icon": "network"
-              },
-              {
-                "title": "Roles, KRAs and KPIs",
-                "path": "admin/roles-kras-kpis",
-                "icon": "gauge"
-              },
-              {
-                "title": "People and invites",
-                "path": "admin/people-and-invites",
-                "icon": "user-plus"
-              },
-              {
-                "title": "Reviews and cadences",
-                "path": "admin/reviews-and-cadences",
-                "icon": "calendar-check"
-              },
-              {
-                "title": "Settings",
-                "path": "admin/settings",
-                "icon": "sliders-horizontal"
-              }
-            ]
-          },
-          {
-            "group": "Reference",
-            "icon": "book-open",
-            "pages": [
-              {
-                "title": "How it connects",
-                "path": "reference/how-it-connects",
-                "icon": "git-branch"
-              },
-              {
-                "title": "Visibility and permissions",
-                "path": "reference/visibility-and-permissions",
-                "icon": "shield-check"
-              },
-              {
-                "title": "Status",
-                "path": "reference/status",
-                "icon": "activity"
-              },
-              {
-                "title": "Glossary",
-                "path": "reference/glossary",
-                "icon": "book-a"
-              }
-            ]
-          }
+          { "group": "Getting Started", "icon": "rocket", "pages": [
+            { "title": "Introduction", "path": "introduction", "icon": "home" },
+            { "title": "Core concepts", "path": "getting-started/core-concepts", "icon": "compass" },
+            { "title": "First week setup", "path": "getting-started/first-week-setup", "icon": "list-checks" }
+          ]},
+          { "group": "Using WorkwrK", "icon": "layers", "pages": [
+            { "title": "Spaces and tasks", "path": "using/spaces-and-tasks", "icon": "square-check" },
+            { "title": "Views", "path": "using/views", "icon": "table" },
+            { "title": "Docs and library", "path": "using/docs-and-library", "icon": "file-text" },
+            { "title": "Goals", "path": "using/goals", "icon": "target" },
+            { "title": "My profile", "path": "using/my-profile", "icon": "user" },
+            { "title": "Time and search", "path": "using/time-and-search", "icon": "timer" }
+          ]},
+          { "group": "Administration", "icon": "settings", "pages": [
+            { "title": "Functions and levels", "path": "admin/functions-and-levels", "icon": "network" },
+            { "title": "Roles, KRAs and KPIs", "path": "admin/roles-kras-kpis", "icon": "gauge" },
+            { "title": "People and invites", "path": "admin/people-and-invites", "icon": "user-plus" },
+            { "title": "Reviews and cadences", "path": "admin/reviews-and-cadences", "icon": "calendar-check" },
+            { "title": "Settings", "path": "admin/settings", "icon": "sliders-horizontal" }
+          ]},
+          { "group": "Reference", "icon": "book-open", "pages": [
+            { "title": "How it connects", "path": "reference/how-it-connects", "icon": "git-branch" },
+            { "title": "Visibility and permissions", "path": "reference/visibility-and-permissions", "icon": "shield-check" },
+            { "title": "Status", "path": "reference/status", "icon": "activity" },
+            { "title": "Glossary", "path": "reference/glossary", "icon": "book-a" }
+          ]}
         ]
       },
       {
         "tab": "API Reference",
         "icon": "code",
         "groups": [
-          {
-            "group": "Endpoints",
-            "icon": "terminal",
-            "openapi": "api-reference/openapi.yaml",
-            "pages": []
-          }
+          { "group": "Guides", "icon": "book-open", "pages": [
+            { "title": "API overview", "path": "api-reference/introduction", "icon": "home" },
+            { "title": "Authentication", "path": "api-reference/authentication", "icon": "key" },
+            { "title": "Pagination", "path": "api-reference/pagination", "icon": "list" },
+            { "title": "Errors", "path": "api-reference/errors", "icon": "triangle-alert" },
+            { "title": "Rate limits", "path": "api-reference/rate-limits", "icon": "gauge" },
+            { "title": "Webhooks", "path": "api-reference/webhooks", "icon": "webhook" }
+          ]},
+          { "group": "Endpoints", "icon": "terminal", "openapi": "api-reference/openapi.json", "pages": [] }
         ]
       },
       {
         "tab": "Help Center",
         "icon": "help-circle",
         "pages": [
-          {
-            "title": "Help Center",
-            "path": "help-center",
-            "icon": "home"
-          },
-          {
-            "group": "FAQs",
-            "icon": "help-circle",
-            "expandable": false,
-            "pages": [
-              {
-                "title": "How to Invite Team",
-                "path": "help-center/faq/how-to-invite-team",
-                "icon": "help-circle"
-              }
-            ]
-          },
-          {
-            "group": "Troubleshooting",
-            "icon": "alert-triangle",
-            "expandable": false,
-            "pages": [
-              {
-                "title": "Cannot Assign Task",
-                "path": "help-center/troubleshooting/cannot-assign-task",
-                "icon": "alert-circle"
-              }
-            ]
-          },
-          {
-            "group": "Guides",
-            "icon": "book-open",
-            "expandable": false,
-            "pages": [
-              {
-                "title": "Create Project",
-                "path": "help-center/guides/create-project",
-                "icon": "book-open"
-              }
-            ]
-          }
+          { "title": "Help Center", "path": "help-center", "icon": "home" },
+          { "group": "FAQs", "icon": "help-circle", "expandable": false, "pages": [
+            { "title": "Inviting your team", "path": "help-center/faq/how-to-invite-team", "icon": "user-plus" },
+            { "title": "Permissions and visibility", "path": "help-center/faq/permissions-and-visibility", "icon": "shield-check" },
+            { "title": "Notifications and reminders", "path": "help-center/faq/notifications-and-reminders", "icon": "bell" }
+          ]},
+          { "group": "Troubleshooting", "icon": "alert-triangle", "expandable": false, "pages": [
+            { "title": "Cannot assign a task", "path": "help-center/troubleshooting/cannot-assign-task", "icon": "alert-circle" },
+            { "title": "Click-capture recorder", "path": "help-center/troubleshooting/sop-extension-capture", "icon": "camera" },
+            { "title": "Missing notes or docs", "path": "help-center/troubleshooting/missing-notes-or-docs", "icon": "file-question" }
+          ]},
+          { "group": "Guides", "icon": "book-open", "expandable": false, "pages": [
+            { "title": "Set up a project", "path": "help-center/guides/create-project", "icon": "folder-plus" },
+            { "title": "Run an SOP", "path": "help-center/guides/run-an-sop", "icon": "scroll-text" },
+            { "title": "Track a goal", "path": "help-center/guides/track-a-goal", "icon": "target" }
+          ]}
         ]
       },
-      {
-        "tab": "Changelog",
-        "icon": "clock",
-        "pages": [
-          {
-            "title": "Release History",
-            "path": "changelog",
-            "icon": "history"
-          }
-        ]
-      }
+      { "tab": "Changelog", "icon": "clock", "pages": [ { "title": "Release History", "path": "changelog", "icon": "history" } ] }
     ]
   }
 }
